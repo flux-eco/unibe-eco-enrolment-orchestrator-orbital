@@ -24,9 +24,14 @@ ENV FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_SOAP_PASSWORD_FILE=/opt/unibe-eco-en
 ENTRYPOINT ["sh", "./docker_entrypoint.sh"]
 
 COPY ./app /opt/unibe-eco-enrolment-orchestrator-orbital/app
+COPY ./configs/page-objects /opt/unibe-eco-enrolment-orchestrator-orbital/configs/page-objects
+COPY ./configs/value-objects /opt/unibe-eco-enrolment-orchestrator-orbital/configs/value-objects
 
-# TODO: Include frontend for prod. backend
 RUN (cd /var/www/html && wget -O - https://github.com/fluxfw/flux-studis-selfservice-frontend/releases/download/v2023-01-31-1/flux-studis-selfservice-frontend-v2023-01-31-1-build.tar.gz | tar -xz --strip-components=1)
 COPY ./docker/assets/logo.svg /var/www/html/Adapter/Logo/logo.svg
+
+RUN mkdir -p "/opt/unibe-eco-enrolment-orchestrator-orbital/configs/reference-objects"
+RUN chown -R flux-eco:flux-eco "/opt/unibe-eco-enrolment-orchestrator-orbital/configs/reference-objects"
+
 WORKDIR /opt/unibe-eco-enrolment-orchestrator-orbital/app
 ENTRYPOINT ["sh", "./docker_entrypoint.sh"]
