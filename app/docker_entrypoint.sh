@@ -1,9 +1,9 @@
 #!/bin/sh
 set -e
 
-function printBanner {
-  echo "..., Doc. Are You Telling Me You Built A Time Machine...Out Of PHP?";
+function install {
+  php /opt/unibe-eco-enrolment-orchestrator-orbital/app/cli/createEnrolmentConfiguration.php
 }
 
-printBanner
+install
 flux-eco-http-synapse.start
