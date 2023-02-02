@@ -1,0 +1,3 @@
+#!/bin/bash
+sh install-dependencies.sh
+docker build ../ -f Dockerfile --target unibe-eco-enrolment-orchestrator-orbital -t unibe-eco-enrolment-orchestrator-orbital:v2023-02-02-1

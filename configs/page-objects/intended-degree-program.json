@@ -1,0 +1,9 @@
+{
+  "page": "intended-degree-program",
+  "data": {
+    "subjects": {
+      "$ref": "../reference-objects/subjects.json"
+    }
+  },
+  "canBack": false
+}

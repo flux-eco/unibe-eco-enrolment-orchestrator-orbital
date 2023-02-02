@@ -1,0 +1,21 @@
+{
+  "page": "legal",
+  "data": {
+    "degree-program": {
+      "id": "degree_program_1",
+      "label": {
+        "en": "Degree program 1",
+        "de": "Studiengang 1"
+      }
+    },
+    "combination":{"id":"combination_1","label":{"en":"Combination of subject 1","de":"Fächerwahl Variante 1"},"mandatory":[{"id":"mandatory_1","label":{"en":"Mandatory subject 1","de":"Pflichtfach 1"},"ect":150}],"single-choice":[{"id":"single_choice_1","label":{"en":"Single choice 1","de":"Einzelwahl 1"},"ect":30,"choices":[{"id":"single_choice_1_1","label":{"en":"Single choice 1-1","de":"Einzelwahl 1-1"},"ect":30},{"id":"single_choice_1_2","label":{"en":"Single choice 1-2","de":"Einzelwahl 1-2"},"ect":30},{"id":"single_choice_1_3","label":{"en":"Single choice 1-3","de":"Einzelwahl 1-3"},"ect":30}]}],"multiple-choice":null},
+    "subject":{"id":"subject_1","label":{"en":"Subject 1","de":"Studiengang 1"},"ect":180},
+    "single-choice":{"single_choice_1":"single_choice_1_1"},
+    "multiple-choice":null,
+    "agb-label":{"en":"AGB","de":"AGB"},
+    "agb-links":{"en":"https://link-to-agb/en","de":"https://link-to-agb/de"},
+    "max-comments-length":2000,
+    "values":null
+  },
+  "canBack": true
+}

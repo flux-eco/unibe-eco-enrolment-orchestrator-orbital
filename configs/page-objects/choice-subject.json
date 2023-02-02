@@ -1,0 +1,9 @@
+{
+  "page": "choice-subject",
+  "data": {
+    "degree-programs": {
+      "$ref": "../reference-objects/degree-programs.json"
+    }
+  },
+  "canBack": false
+}

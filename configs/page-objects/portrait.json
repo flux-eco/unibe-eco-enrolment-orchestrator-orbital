@@ -1,0 +1,7 @@
+{
+  "page": "portrait",
+  "data": {
+      "$ref": "../reference-objects/portrait.json"
+  },
+  "canBack": true
+}

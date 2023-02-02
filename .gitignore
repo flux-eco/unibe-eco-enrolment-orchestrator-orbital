@@ -1,0 +1,10 @@
+/*
+!.gitignore
+!LICENSE
+!README.md
+!app/
+!docker/
+configs/*
+!configs/
+!configs/page-objects
+!configs/value-objects
