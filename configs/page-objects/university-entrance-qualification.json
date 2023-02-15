@@ -7,6 +7,9 @@
       },
       {
         "$ref": "../reference-objects/certificates.json"
+      },
+      {
+        "$ref": "../reference-objects/certificate-types.json"
       }
     ],
     "values": null
