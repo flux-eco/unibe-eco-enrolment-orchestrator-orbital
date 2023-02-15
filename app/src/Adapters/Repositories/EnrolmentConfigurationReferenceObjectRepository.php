@@ -2,6 +2,7 @@
 
 namespace UnibeEco\EnrolmentOrchestratorOrbital\Adapters\Repositories;
 
+use DateTime;
 use stdClass;
 use UnibeEco\EnrolmentOrchestratorOrbital\Adapters\Config\DegreeProgramConfig;
 use UnibeEco\EnrolmentOrchestratorOrbital\Adapters\Config\SoapFile;
@@ -26,8 +27,8 @@ use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ValueObjects\{LanguageCode
     Label,
     MandatoryType,
     ChoiceType,
-    ValueObjectName
-};
+    ValueObjectName,
+    Year};
 use JsonSerializable;
 use SoapFault;
 
@@ -81,6 +82,7 @@ class EnrolmentConfigurationReferenceObjectRepository
             ReferenceObjectName::CERTIFICATE_TYPES => $this->createCertificateTypes(),
             ReferenceObjectName::GRADUATION_TYPES => $this->createGraduationTypes(),
             ReferenceObjectName::CERTIFICATES => $this->createCertificates(),
+            ReferenceObjectName::CERTIFICATES_ISSUE_YEARS => $this->createCertificatesIssueYears(),
             ReferenceObjectName::PHOTO_TYPE => [],
             ReferenceObjectName::PLACES => $this->createPlaces(),
             ReferenceObjectName::SCHOOLS => [],
@@ -134,11 +136,24 @@ class EnrolmentConfigurationReferenceObjectRepository
         $this->writeReferenceObject(ReferenceObjectName::GRADUATION_TYPES, $list);
     }
 
+    private function createCertificatesIssueYears(): void
+    {
+        $minYear = 1900;
+        $maxYear = (new DateTime)->format("Y");
+        $issueYears = [];
+        for ($year = $minYear; $year <= $maxYear; $year++) {
+            $issueYears[] = Year::new((string)$year);
+        }
+        $this->writeReferenceObject(ReferenceObjectName::CERTIFICATES_ISSUE_YEARS, $issueYears);
+    }
+
     private function createCertificates(): void
     {
         $list = $this->queryCertificates('GetListStudienberechtigungsausweis', ['GetListStudienberechtigungsausweisResult']);
         $this->writeReferenceObject(ReferenceObjectName::CERTIFICATES, $list);
     }
+
+
 
     private function createSubjects(): void
     {

@@ -19,6 +19,7 @@ enum ReferenceObjectName: string
     case CERTIFICATE_TYPES = "certificate-types";
     case GRADUATION_TYPES = "graduation-types";
     case CERTIFICATES = "certificates";
+    case CERTIFICATES_ISSUE_YEARS = "certificates-issue-years";
     case LANGUAGES = "languages";
     case PHOTO_TYPE = "photo-type";
     case PLACES = "places";

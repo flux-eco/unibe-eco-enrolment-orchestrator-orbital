@@ -37,6 +37,7 @@ final class EnrolmentConfigurationAggregate
         $this->messageRecorder->record(OutgoingMessages\Message::new($header, OutgoingMessages\CreateReferenceObject::new(ReferenceObjectName::SCHOOLS)));
         $this->messageRecorder->record(OutgoingMessages\Message::new($header, OutgoingMessages\CreateReferenceObject::new(ReferenceObjectName::CANTONS)));
         $this->messageRecorder->record(OutgoingMessages\Message::new($header, OutgoingMessages\CreateReferenceObject::new(ReferenceObjectName::COUNTRIES)));
+        $this->messageRecorder->record(OutgoingMessages\Message::new($header, OutgoingMessages\CreateReferenceObject::new(ReferenceObjectName::CERTIFICATES_ISSUE_YEARS)));
     }
 
 }
