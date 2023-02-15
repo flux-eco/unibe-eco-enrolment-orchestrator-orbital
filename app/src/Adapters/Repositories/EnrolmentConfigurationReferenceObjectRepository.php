@@ -81,7 +81,6 @@ class EnrolmentConfigurationReferenceObjectRepository
             ReferenceObjectName::CERTIFICATE_TYPES => $this->createCertificateTypes(),
             ReferenceObjectName::GRADUATION_TYPES => $this->createGraduationTypes(),
             ReferenceObjectName::CERTIFICATES => $this->createCertificates(),
-            ReferenceObjectName::LANGUAGES => [],
             ReferenceObjectName::PHOTO_TYPE => [],
             ReferenceObjectName::PLACES => $this->createPlaces(),
             ReferenceObjectName::SCHOOLS => [],
@@ -93,6 +92,9 @@ class EnrolmentConfigurationReferenceObjectRepository
             ReferenceObjectName::LEGAL => [],
             ReferenceObjectName::PORTRAIT => [],
             ReferenceObjectName::UNIVERSITY_ENTRANCE_QUALIFICATION => [],
+            ReferenceObjectName::BASE_DATA => throw new \Exception('To be implemented'),
+            ReferenceObjectName::SUBJECT_COMBINATIONS => throw new \Exception('To be implemented'),
+            ReferenceObjectName::LANGUAGES => throw new \Exception('To be implemented'),
         };
     }
 
@@ -256,7 +258,7 @@ class EnrolmentConfigurationReferenceObjectRepository
         }
         $dataList = [];
         foreach ($germanDatalist as $germanData) {
-            $dataList[$germanData->UniqueId] = LabelValueReferenceObject::new(
+            $dataList[] = LabelValueReferenceObject::new(
                 $germanData->UniqueId,
                 Label::new(
                     $englishDataByUniqueIdList[$germanData->UniqueId]->Title,

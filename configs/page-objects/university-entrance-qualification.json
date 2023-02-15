@@ -1,9 +1,9 @@
 {
   "page": "university-entrance-qualification",
   "data": {
-    "certificate-types": {
-      "$ref": "../reference-objects/certificate-types.json"
-    },
+    "data":  [{
+      "$ref": "../reference-objects/cantons.json"
+    }],
     "values": null
   },
   "canBack": true
