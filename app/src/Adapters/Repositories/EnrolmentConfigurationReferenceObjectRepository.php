@@ -398,7 +398,7 @@ class EnrolmentConfigurationReferenceObjectRepository
     {
         $client = $this->getClient(SoapFile::HELPTABLE->toPath());
 
-        $cantonsWithSchoolsByCertificate = $this->queryCantonsWithSchoolsByCertificate('GetListSchuleMaturitaet', ['GetListSchuleMaturitaetResult']);
+        //$cantonsWithSchoolsByCertificate = $this->queryCantonsWithSchoolsByCertificate('GetListSchuleMaturitaet', ['GetListSchuleMaturitaetResult']);
 
         $germanDatalist = $this->queryDatalist($client, $operationName, $operationResultName, LanguageCode::GERMAN, $additionalParameters);
         $englishDatalist = $this->queryDatalist($client, $operationName, $operationResultName, LanguageCode::ENGLISH, $additionalParameters);
@@ -410,6 +410,15 @@ class EnrolmentConfigurationReferenceObjectRepository
         $dataList = [];
         foreach ($germanDatalist as $germanData) {
 
+            $dataList[] = LabelValueReferenceObject::new(
+                $germanData->UniqueId,
+                Label::new(
+                    $englishDataByUniqueIdList[$germanData->UniqueId]->Title,
+                    $germanData->Title
+                )
+            );
+
+            /*
             $obj = new stdClass();
             $obj->id = $germanData->UniqueId;
             $obj->label = Label::new(
@@ -425,6 +434,7 @@ class EnrolmentConfigurationReferenceObjectRepository
             }
 
             $dataList[$obj->certificateTypeUniqueId][] = $obj;
+            */
         }
 
         return $dataList;

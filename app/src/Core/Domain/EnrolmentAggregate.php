@@ -167,8 +167,15 @@ final class EnrolmentAggregate
                 $pageObject->data->$keyName = json_decode(file_get_contents($pageObjectDirectoryPath . "/" . $value->{'$ref'}));
             }
             if($keyName === "data") {
-                if(is_array($value) && (is_object(($value[0])) && property_exists($value[0], '$ref'))) {
-                    $pageObject->data->data = [json_decode(file_get_contents($pageObjectDirectoryPath . "/" . $value[0]->{'$ref'}))];
+
+                if(is_array($value)) {
+                    $data = [];
+                    foreach($value as $key => $item) {
+                        if(is_object(($item)) && property_exists($item, '$ref')) {
+                            $data[] = json_decode(file_get_contents($pageObjectDirectoryPath . "/" . $item->{'$ref'}));
+                        }
+                    }
+                    $pageObject->data->data = $data;
                 }
             }
         }
