@@ -3,23 +3,22 @@
 namespace UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ReferenceObjects;
 use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ValueObjects;
 
-final readonly class SubjectCombination {
+final readonly class DegreeProgrammeType {
     private function __construct(
-        public string $id,
+        public string             $id,
         public ValueObjects\Label $label,
-        public array $mandatory,
-        public array $singleChoice,
-        public array $multipleChoice
+        public array|null         $mandatory,
+        public array|null         $singleChoice,
+        public array|null         $multipleChoice
     ) {
 
     }
-
     public static function new(
-        string $id,
+        string             $id,
         ValueObjects\Label $label,
-        array $mandatory,
-        array $singleChoice,
-        array $multipleChoice
+        array|null         $mandatory = null,
+        array|null         $singleChoice = null,
+        array|null         $multipleChoice = null
     ) {
         return new self(...get_defined_vars());
     }

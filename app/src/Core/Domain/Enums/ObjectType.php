@@ -1,7 +1,6 @@
 <?php
 
-namespace UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ReferenceObjects;
-use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ValueObjects;
+namespace UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ValueObjects;
 enum ReferenceObjectName: string
 {
     case BASE_DATA = "base-data";
@@ -17,8 +16,12 @@ enum ReferenceObjectName: string
     case AREA_CODES = "area-codes";
     case CANTONS = "cantons";
     case CERTIFICATE_TYPES = "certificate-types";
+
+    case CERTIFICATE_TYPE = "certificate-type";
     case GRADUATION_TYPES = "graduation-types";
     case CERTIFICATES = "certificates";
+
+    case CERTIFICATE = "certificate";
     case CERTIFICATES_ISSUE_YEARS = "certificates-issue-years";
     case LANGUAGES = "languages";
     case PHOTO_TYPE = "photo-type";

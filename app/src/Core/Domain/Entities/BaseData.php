@@ -4,7 +4,7 @@ namespace UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ReferenceObjects;
 
 use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ValueObjects\ValueObjectName;
 
-final readonly class BaseData
+final class BaseData
 {
     private function __construct(
         public string $AHV,
