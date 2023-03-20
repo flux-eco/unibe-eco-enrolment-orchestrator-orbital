@@ -3,6 +3,7 @@
 namespace UnibeEco\EnrolmentOrchestratorOrbital\Adapters\Config;
 
 use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ValueObjects;
+use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\Enums;
 
 final readonly class SoapParameters
 {
@@ -16,7 +17,7 @@ final readonly class SoapParameters
     public static function new(
         string      $serverHost,
         ValueObjects\Credentials  $credentials,
-        ValueObjects\LanguageCode $languageCode
+        Enums\LanguageCode $languageCode
     ): self
     {
         return new self(

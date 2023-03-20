@@ -25,17 +25,22 @@ final readonly class Service
     {
         $messageRecorder = Domain\MessageRecorder::new();
         $aggregate = Domain\EnrolmentConfigurationAggregate::new(
+            $this->outbounds->configFilesDirectoryPath,
+            $this->outbounds->enrolmentConfigurationReferenceObjectsRepository,
             $messageRecorder
         );
-        $aggregate->createOrUpdateSpecification();
 
-        foreach ($aggregate->messageRecorder->recordedMessages as $message) {
-            $this->outbounds->configurationMessageDispatcher->dispatch(
-                $message
-            );
-        }
+        $aggregate->createUniversityQualificationSelects();
 
-        $aggregate->messageRecorder->flush();
+        /* $aggregate->createOrUpdateSpecification();
+
+         foreach ($aggregate->messageRecorder->recordedMessages as $message) {
+             $this->outbounds->configurationMessageDispatcher->dispatch(
+                 $message
+             );
+         }
+
+         $aggregate->messageRecorder->flush();*/
     }
 
     public function provideLayout(IncomingMessages\ProvideLayout $message, callable $publish): void
@@ -46,7 +51,7 @@ final readonly class Service
             $this->outbounds->enrolmentRepository
         );
         $aggregate->provideLayout($message->valueObjectsConfigDirectoryPath);
-
+        echo $message->valueObjectsConfigDirectoryPath;
         foreach ($messageRecorder->recordedMessages as $message) {
             $this->outbounds->enrolmentMessageDispatcher->dispatch($message, $publish);
         }

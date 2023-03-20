@@ -1,8 +1,8 @@
 <?php
 
-namespace  UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ValueObjects;
+namespace  UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\Enums;
 
 enum LanguageCode:string {
-    case GERMAN = "de";
-    case ENGLISH = "en";
+    case DE = "de";
+    case EN = "en";
 }

@@ -2,16 +2,30 @@
 
 namespace UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ValueObjects;
 
-final readonly class Year {
+use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\Enums\LanguageCode;
+
+final readonly class Year
+{
     private function __construct(
-        public string $id
-    ) {
+        public string $id,
+        public array  $label
+    )
+    {
 
     }
 
     public static function new(
         string $id,
-    ) {
-        return new self($id);
+    ): Year
+    {
+        return new self(
+            $id,
+            [
+                LocalizedStringValue::new(
+                    LanguageCode::DE->value,
+                    $id
+                )
+            ]
+        );
     }
 }

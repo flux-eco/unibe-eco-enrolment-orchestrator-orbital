@@ -2,7 +2,7 @@
 set -e
 
 function install {
-  php /opt/unibe-eco-enrolment-orchestrator-orbital/app/cli/createEnrolmentConfiguration.php
+  php cli/createEnrolmentConfiguration.php
 }
 
 install

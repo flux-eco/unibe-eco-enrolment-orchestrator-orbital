@@ -28,18 +28,23 @@ class HttpApi
     public static function new(): self
     {
         $config = Config::new();
+
+        $repository =   Repositories\EnrolmentConfigurationReferenceObjectRepository::new(
+            $config->configFilesDirectoryPath,
+            $config->soapWsdlServer,
+            $config->soapServerHost,
+            $config->credentials,
+            $config->degreeProgramSubjectFilter
+        );
+
         return new self(
             $config,
             Ports\Service::new(
                 Ports\Outbounds::new(
+                    "/opt/unibe-eco-enrolment-orchestrator-orbital/configs/",
+                    $repository,
                     Dispatchers\ConfiguratioinMessageDispatcher::new(
-                        Repositories\EnrolmentConfigurationReferenceObjectRepository::new(
-                            $config->configFilesDirectoryPath,
-                            $config->soapWsdlServer,
-                            $config->soapServerHost,
-                            $config->credentials,
-                            $config->degreeProgramSubjectFilter
-                        )
+                        $repository
                     ),
                     Dispatchers\EnrolmentMessageDispatcher::new(),
                     Repositories\EnrolmentRepository::new(

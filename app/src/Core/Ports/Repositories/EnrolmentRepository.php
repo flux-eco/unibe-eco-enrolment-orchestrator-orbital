@@ -2,8 +2,8 @@
 
 namespace UnibeEco\EnrolmentOrchestratorOrbital\Core\Ports\Repositories;
 
-use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ReferenceObjects\BaseData;
-use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ValueObjects\LanguageCode;
+use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\Entities\BaseData;
+use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\Enums\LanguageCode;
 
 interface EnrolmentRepository
 {

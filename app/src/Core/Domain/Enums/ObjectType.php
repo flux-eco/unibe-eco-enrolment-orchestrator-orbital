@@ -1,7 +1,7 @@
 <?php
 
-namespace UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ValueObjects;
-enum ReferenceObjectName: string
+namespace UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\Enums;
+enum ObjectType: string
 {
     case BASE_DATA = "base-data";
     case DEGREE_PROGRAMS = "degree-programs";
@@ -23,6 +23,7 @@ enum ReferenceObjectName: string
 
     case CERTIFICATE = "certificate";
     case CERTIFICATES_ISSUE_YEARS = "certificates-issue-years";
+    case UNIVERSITY_QUALIFICATION_SELECTS = "university-qualification-selects";
     case LANGUAGES = "languages";
     case PHOTO_TYPE = "photo-type";
     case PLACES = "places";
@@ -35,12 +36,19 @@ enum ReferenceObjectName: string
     case LEGAL = "legal";
     case PORTRAIT = "portrait";
     case UNIVERSITY_ENTRANCE_QUALIFICATION = "university-entrance-qualification";
+    case CERTIFICATE_TYPE_YEAR_RANGE = "certificateTypeYearRange";
 
-    public function toLabel(): string  {
+    case LABEL = "label";
+
+
+
+    public function toLabel(): string
+    {
         return $this->value;
     }
 
-    public function toParameterName(): string  {
+    public function toParameterName(): string
+    {
         return $this->value;
     }
 }

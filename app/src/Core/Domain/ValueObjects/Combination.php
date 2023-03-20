@@ -6,22 +6,22 @@ final readonly class Combination implements \JsonSerializable
 {
     private function __construct(
         public string $id,
-        public Label $label,
-        public int $ect,
-        public array $mandatory,
-        public array $singleChoice,
-        public array $multipleChoice
+        public Label  $label,
+        public int    $ect,
+        public array  $mandatory,
+        public array  $singleChoice,
+        public array  $multipleChoice
     ) {
 
     }
 
     public static function new(
         string $id,
-        Label $label,
-        int $ect,
-        array $mandatory,
-        array $singleChoice,
-        array $multipleChoice
+        Label  $label,
+        int    $ect,
+        array  $mandatory,
+        array  $singleChoice,
+        array  $multipleChoice
     ): self {
         return new self(...get_defined_vars());
     }

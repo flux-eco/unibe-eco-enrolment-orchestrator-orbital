@@ -1,20 +1,20 @@
 <?php
 
 namespace UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\OutgoingMessages;
-use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ReferenceObjects\ReferenceObjectName;
+use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\Entities\ObjectType;
 use JsonSerializable;
 
 final readonly class CreateReferenceObject
 {
     private function __construct(
-        public ReferenceObjectName $referenceObjectName
+        public ObjectType $referenceObjectName
     )
     {
 
     }
 
     public static function new(
-        ReferenceObjectName $referenceObjectName
+        ObjectType $referenceObjectName
     ) : self
     {
         return new self(

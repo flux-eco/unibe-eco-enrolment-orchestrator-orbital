@@ -3,18 +3,18 @@
 namespace UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ValueObjects;
 
 use stdClass;
-use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ReferenceObjects;
+use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\Entities;
 
 final readonly class EnrolmentData
 {
     private function __construct(
-        public null|ReferenceObjects\BaseData|stdClass $baseData = null
+        public null|Entities\BaseData|stdClass $baseData = null
     )
     {
 
     }
 
-    public static function new(null|ReferenceObjects\BaseData|stdClass $baseData = null): self
+    public static function new(null|Entities\BaseData|stdClass $baseData = null): self
     {
         return new self(...get_defined_vars());
     }

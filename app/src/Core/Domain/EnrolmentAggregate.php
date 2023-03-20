@@ -2,7 +2,7 @@
 
 namespace UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain;
 
-use Unibe\StudyEnrolment\Adapters\Values\Value;
+use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\Enums\LanguageCode;
 use UnibeEco\EnrolmentOrchestratorOrbital\Core\Ports\Repositories\EnrolmentRepository;
 use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ValueObjects;
 use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\OutgoingMessages;
@@ -59,17 +59,16 @@ final class EnrolmentAggregate
             ValueObjects\PageName::CHOICE_SUBJECT => ValueObjects\PageName::INTENDED_DEGREE_PROGRAM,
             ValueObjects\PageName::INTENDED_DEGREE_PROGRAM => ValueObjects\PageName::INTENDED_DEGREE_PROGRAM_2,
             ValueObjects\PageName::INTENDED_DEGREE_PROGRAM_2 => ValueObjects\PageName::UNIVERSITY_ENTRANCE_QUALIFICATION,
-            ValueObjects\PageName::UNIVERSITY_ENTRANCE_QUALIFICATION => throw new \Exception('To be implemented'),
-            ValueObjects\PageName::PORTRAIT => throw new \Exception('To be implemented'),
-            ValueObjects\PageName::PAGE_DATA => throw new \Exception('To be implemented'),
-            ValueObjects\PageName::LEGAL => throw new \Exception('To be implemented'),
-            ValueObjects\PageName::COMPLETED => throw new \Exception('To be implemented')
+            ValueObjects\PageName::UNIVERSITY_ENTRANCE_QUALIFICATION => ValueObjects\PageName::PORTRAIT,
+            ValueObjects\PageName::PORTRAIT => ValueObjects\PageName::PAGE_DATA,
+            ValueObjects\PageName::PAGE_DATA => [],
+            ValueObjects\PageName::LEGAL => [],
+            ValueObjects\PageName::COMPLETED => []
         };
     }
 
     public function storeData(ValueObjects\PageName $pageName, string $sessionId, object $dataToStore, ValueObjects\EnrolmentData $enrolmentData): void
     {
-        print_r($dataToStore);
         $this->enrolmentData = $enrolmentData;
         match ($pageName) {
             ValueObjects\PageName::CREATE => $this->createEnrolment($sessionId, $dataToStore->semester, $dataToStore->password),
@@ -78,8 +77,8 @@ final class EnrolmentAggregate
             ValueObjects\PageName::CHOICE_SUBJECT => $this->changeChoiceSubject($sessionId, $dataToStore->{'degree-program'}, $dataToStore->{'qualifications'}),
             ValueObjects\PageName::INTENDED_DEGREE_PROGRAM => $this->changeDegreeProgram($sessionId, $dataToStore->{'subject'}, $dataToStore->{'combination'}),
             ValueObjects\PageName::INTENDED_DEGREE_PROGRAM_2 => $this->changeDegreeProgramDetail($sessionId, $dataToStore->{'single-choice'}, $dataToStore->{'multiple-choice'}, $dataToStore->{'further-information'}),
-            ValueObjects\PageName::UNIVERSITY_ENTRANCE_QUALIFICATION => throw new \Exception('To be implemented'),
-            ValueObjects\PageName::PORTRAIT => throw new \Exception('To be implemented'),
+            ValueObjects\PageName::UNIVERSITY_ENTRANCE_QUALIFICATION => $this->changeEntranceQualification($sessionId, $dataToStore->{'certificate-type'}),
+            ValueObjects\PageName::PORTRAIT => $this->changePortrait($sessionId),
             ValueObjects\PageName::PAGE_DATA => throw new \Exception('To be implemented'),
             ValueObjects\PageName::LEGAL => throw new \Exception('To be implemented'),
             ValueObjects\PageName::COMPLETED => throw new \Exception('To be implemented')
@@ -88,7 +87,7 @@ final class EnrolmentAggregate
 
     private function createEnrolment(string $sessionId, string $semester, string $password)
     {
-        $storedBaseData = $this->enrolmentRepository->create($sessionId, $password, ValueObjects\LanguageCode::GERMAN);
+        $storedBaseData = $this->enrolmentRepository->create($sessionId, $password, Enums\LanguageCode::DE);
         $this->applyEnrolmentCreated(OutgoingMessages\EnrolmentCreated::new(ValueObjects\EnrolmentData::new($storedBaseData)));
         $this->applyDataStored(OutgoingMessages\DataStored::new(ValueObjects\PageName::CREATE, $sessionId, ValueObjects\EnrolmentData::new($storedBaseData), true));
     }
@@ -107,7 +106,7 @@ final class EnrolmentAggregate
     {
         $baseData = $this->enrolmentData->baseData;
         $baseData->StudienstufeUniqueId = $degreeProgram;
-        $storedBaseData = $this->enrolmentRepository->storeBaseData($sessionId, $baseData, ValueObjects\LanguageCode::GERMAN);
+        $storedBaseData = $this->enrolmentRepository->storeBaseData($sessionId, $baseData, Enums\LanguageCode::DE);
 
         $this->applyDataStored(OutgoingMessages\DataStored::new(ValueObjects\PageName::CHOICE_SUBJECT, $sessionId, ValueObjects\EnrolmentData::new($storedBaseData), true));
     }
@@ -117,7 +116,7 @@ final class EnrolmentAggregate
         $baseData = $this->enrolmentData->baseData;
         $baseData->StudiengangsversionUniqueId = $subject;
         $baseData->StudienstrukturUniqueId = $combination;
-        $storedBaseData = $this->enrolmentRepository->storeBaseData($sessionId, $baseData, ValueObjects\LanguageCode::GERMAN);
+        $storedBaseData = $this->enrolmentRepository->storeBaseData($sessionId, $baseData, Enums\LanguageCode::DE);
 
         $this->applyDataStored(OutgoingMessages\DataStored::new(ValueObjects\PageName::INTENDED_DEGREE_PROGRAM, $sessionId, ValueObjects\EnrolmentData::new($storedBaseData), true));
     }
@@ -144,6 +143,24 @@ final class EnrolmentAggregate
         $this->applyDataStored(OutgoingMessages\DataStored::new(ValueObjects\PageName::INTENDED_DEGREE_PROGRAM_2, $sessionId, ValueObjects\EnrolmentData::new($baseData), true));
     }
 
+    private function changeEntranceQualification(string $sessionId, int $certificateType)
+    {
+        $baseData = $this->enrolmentData->baseData;
+        //
+
+        $this->applyDataStored(OutgoingMessages\DataStored::new(ValueObjects\PageName::UNIVERSITY_ENTRANCE_QUALIFICATION, $sessionId, ValueObjects\EnrolmentData::new($baseData), true));
+
+    }
+
+    private function changePortrait(string $sessionId)
+    {
+        $baseData = $this->enrolmentData->baseData;
+        //
+        $this->applyDataStored(OutgoingMessages\DataStored::new(ValueObjects\PageName::PORTRAIT, $sessionId, ValueObjects\EnrolmentData::new($baseData), true));
+
+    }
+
+
     private function applyDataStored(OutgoingMessages\DataStored $dataStored)
     {
         $this->enrolmentData = $dataStored->enrolmentData;
@@ -166,12 +183,12 @@ final class EnrolmentAggregate
             if (is_object($value) && property_exists($value, '$ref')) {
                 $pageObject->data->$keyName = json_decode(file_get_contents($pageObjectDirectoryPath . "/" . $value->{'$ref'}));
             }
-            if($keyName === "data") {
+            if ($keyName === "data") {
 
-                if(is_array($value)) {
+                if (is_array($value)) {
                     $data = [];
-                    foreach($value as $key => $item) {
-                        if(is_object(($item)) && property_exists($item, '$ref')) {
+                    foreach ($value as $key => $item) {
+                        if (is_object(($item)) && property_exists($item, '$ref')) {
                             $data[] = json_decode(file_get_contents($pageObjectDirectoryPath . "/" . $item->{'$ref'}));
                         }
                     }
@@ -202,9 +219,19 @@ final class EnrolmentAggregate
 
     private function hydrateChoosenSubjectData(object $pageObject, ?ValueObjects\EnrolmentData $enrolmentData): object
     {
-        $pageObject->data->subject = ReferenceObjects\Subject::new(
+        $pageObject->data->subject = Entities\Subject::new(
             $enrolmentData->baseData->StudiengangsversionUniqueId,
-            ValueObjects\Label::new($enrolmentData->baseData->Studiengangsversion,$enrolmentData->baseData->Studiengangsversion),
+            ValueObjects\Label::new(
+                [
+                    ValueObjects\LocalizedStringValue::new(
+                        LanguageCode::DE->value,
+                        $enrolmentData->baseData->Studiengangsversion
+                    ),
+                    ValueObjects\LocalizedStringValue::new(
+                        LanguageCode::EN->value,
+                        $enrolmentData->baseData->Studiengangsversion
+                    )
+                ]),
             $enrolmentData->baseData->StudiengangsversionReqEcts,
         );
         $pageObject->data->combination = $pageObject->data->combinations->{$enrolmentData->baseData->StudienstrukturUniqueId};

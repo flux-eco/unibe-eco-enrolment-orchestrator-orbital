@@ -10,8 +10,8 @@ use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\OutgoingMessages\{
     MessageName,
     CreateReferenceObject
 };
-use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ReferenceObjects\{
-    ReferenceObjectName,
+use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\Entities\{
+    ObjectType,
     LabelValueReferenceObject,
     Qualification,
     DegreeProgramme,
@@ -19,15 +19,17 @@ use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ReferenceObjects\{
     Subject
 };
 use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ValueObjects\{
-    LanguageCode,
     Server,
     Credentials,
     Label,
     MandatoryType,
     ValueObjectName
 };
+use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\Enums\{
+    LanguageCode
+};
 
-use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ReferenceObjects\{
+use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\Entities\{
     BaseData
 };
 

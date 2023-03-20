@@ -1,8 +1,7 @@
 <?php
 
-namespace UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ReferenceObjects;
+namespace UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\Entities;
 
-use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ValueObjects\ValueObjectName;
 
 final class BaseData
 {

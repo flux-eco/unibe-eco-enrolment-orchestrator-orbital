@@ -15,17 +15,34 @@ enum EnvName: string
     case FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_SOAP_USER_FILE = 'FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_SOAP_USER_FILE';
     case FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_SOAP_PASSWORD_FILE = 'FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_SOAP_PASSWORD_FILE';
 
-    public function toConfigValue() : string|int|array
+    public function toConfigValue(): string|int|array
     {
         return match ($this) {
             self::FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_CONFIG_FILES_DIRECTORY_PATH,
             self::FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_SOAP_WSDL_SERVER_PROTOCOL,
-            self::FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_SOAP_WSDL_SERVER_PORT => getenv($this->value),
+            self::FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_SOAP_WSDL_SERVER_PORT => $this->readConfigValue(),
             self::FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_SOAP_WSDL_SERVER_HOST_FILE,
             self::FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_SOAP_SERVER_HOST_FILE,
             self::FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_SOAP_USER_FILE,
             self::FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_SOAP_PASSWORD_FILE
-            => file_get_contents(str_replace(["\r", "\n"], '', getenv($this->value)))
+            => file_get_contents(str_replace(["\r", "\n"], '', $this->readConfigValue()))
+        };
+    }
+
+    private function readConfigValue()
+    {
+        if (getenv($this->value) !== false) {
+            return getenv($this->value);
+        }
+
+        return match ($this) {
+            self::FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_CONFIG_FILES_DIRECTORY_PATH => "../../configs",
+            self::FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_SOAP_WSDL_SERVER_PROTOCOL => "https",
+            self::FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_SOAP_WSDL_SERVER_PORT => "443",
+            self::FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_SOAP_WSDL_SERVER_HOST_FILE => "../../secrets/soap-wsdl-server-host",
+            self::FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_SOAP_SERVER_HOST_FILE => "../../secrets/soap-server-host",
+            self::FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_SOAP_USER_FILE => "../../secrets/soap-user",
+            self::FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_SOAP_PASSWORD_FILE => "../../secrets/soap-password"
         };
     }
 }
