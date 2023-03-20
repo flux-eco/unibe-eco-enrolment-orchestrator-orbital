@@ -6,7 +6,7 @@ namespace UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ValueObjects;
 final readonly class DependentSelectInputOption implements \JsonSerializable
 {
     private function __construct(
-        public int $choiceIndex,
+        public string $choiceIndex,
         public int $nextSelectIndex,
     )
     {
@@ -14,7 +14,7 @@ final readonly class DependentSelectInputOption implements \JsonSerializable
     }
 
     public static function new(
-        int $choiceIndex,
+        string $choiceIndex,
         int $nextSelectIndex,
     ): self
     {

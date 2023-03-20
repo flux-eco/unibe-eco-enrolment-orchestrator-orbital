@@ -8,14 +8,14 @@ final readonly class Certificate
 {
     /**
      * @param string $id
-     * @param ValueObjects\LocalizedStringValue[] $label
+     * @param  ValueObjects\Label $label
      * @param int $minIssueYear
      * @param int $maxIssueYear
      * @param int $certificateTypeId
      */
     private function __construct(
         public string             $id,
-        public array              $label,
+        public  ValueObjects\Label              $label,
         public int                $minIssueYear,
         public int                $maxIssueYear,
         public int                $certificateTypeId
@@ -26,7 +26,7 @@ final readonly class Certificate
 
     /**
      * @param string $id
-     * @param ValueObjects\LocalizedStringValue[] $label
+     * @param  ValueObjects\Label $label
      * @param int $minIssueYear
      * @param int $maxIssueYear
      * @param int $certificateTypeId
@@ -34,7 +34,7 @@ final readonly class Certificate
      */
     public static function new(
         string             $id,
-        array              $label,
+        ValueObjects\Label              $label,
         int                $minIssueYear,
         int                $maxIssueYear,
         int                $certificateTypeId

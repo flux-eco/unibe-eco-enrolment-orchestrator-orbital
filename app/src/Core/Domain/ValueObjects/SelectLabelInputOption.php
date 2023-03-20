@@ -3,19 +3,19 @@
 namespace UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ValueObjects;
 
 
-final readonly class SelectInputOption
+final readonly class SelectLabelInputOption
 {
     private function __construct(
-        public int   $id,
-        public array $label
+        public string   $id,
+        public Label $label
     )
     {
 
     }
 
     public static function new(
-        int   $id,
-        array $label
+        string   $id,
+        Label $label
     ): self
     {
         return new self(...get_defined_vars());

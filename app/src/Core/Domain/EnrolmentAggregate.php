@@ -221,17 +221,7 @@ final class EnrolmentAggregate
     {
         $pageObject->data->subject = Entities\Subject::new(
             $enrolmentData->baseData->StudiengangsversionUniqueId,
-            ValueObjects\Label::new(
-                [
-                    ValueObjects\LocalizedStringValue::new(
-                        LanguageCode::DE->value,
-                        $enrolmentData->baseData->Studiengangsversion
-                    ),
-                    ValueObjects\LocalizedStringValue::new(
-                        LanguageCode::EN->value,
-                        $enrolmentData->baseData->Studiengangsversion
-                    )
-                ]),
+            ValueObjects\Label::new($enrolmentData->baseData->Studiengangsversion, $enrolmentData->baseData->Studiengangsversion),
             $enrolmentData->baseData->StudiengangsversionReqEcts,
         );
         $pageObject->data->combination = $pageObject->data->combinations->{$enrolmentData->baseData->StudienstrukturUniqueId};

@@ -8,13 +8,13 @@ final readonly class CertificateType
 {
     /**
      * @param string $id
-     * @param ValueObjects\LocalizedStringValue[] $label
+     * @param ValueObjects\Label $label
      * @param bool $municipalityRequired
      */
     private function __construct(
         public string $id,
-        public array  $label,
-        public bool   $municipalityRequired,
+        public ValueObjects\Label $label,
+        public bool $municipalityRequired,
     )
     {
 
@@ -22,14 +22,14 @@ final readonly class CertificateType
 
     /**
      * @param string $id
-     * @param ValueObjects\LocalizedStringValue[] $label
+     * @param ValueObjects\Label $label
      * @param bool $municipalityRequired
      * @return static
      */
     public static function new(
         string $id,
-        array  $label,
-        bool   $municipalityRequired,
+        ValueObjects\Label $label,
+        bool $municipalityRequired,
     ): self
     {
         return new self($id, $label, $municipalityRequired);

@@ -8,7 +8,7 @@ final readonly class Year
 {
     private function __construct(
         public string $id,
-        public array  $label
+        public Label  $label
     )
     {
 
@@ -20,12 +20,7 @@ final readonly class Year
     {
         return new self(
             $id,
-            [
-                LocalizedStringValue::new(
-                    LanguageCode::DE->value,
-                    $id
-                )
-            ]
+            Label::newGermanLabel($id),
         );
     }
 }

@@ -3,6 +3,7 @@
 namespace UnibeEco\EnrolmentOrchestratorOrbital\Adapters\Omnitracker;
 
 
+use Unibe\StudyEnrolment\Adapters\Values\Value;
 use UnibeEco\EnrolmentOrchestratorOrbital\Adapters\Config\OmnitrackerBinding;
 
 
@@ -13,7 +14,7 @@ use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\Enums\ObjectType;
 use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ValueObjects\CertificateIssueYear;
 use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ValueObjects\CertificateTypeIssueYearRange;
 use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ValueObjects;
-use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ValueObjects\SelectInputOption;
+use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ValueObjects\SelectLabelInputOption;
 use UnibeEco\EnrolmentOrchestratorOrbital\Core\Domain\ValueObjects\Year;
 use WeakMap;
 
@@ -79,7 +80,7 @@ final class OmnitrackerDegreeProgrammeRecords
     }
 
     /**
-     * @return SelectInputOption[] array
+     * @return SelectLabelInputOption[] array
      */
     public function getCertificateTypeSelectInputOptions(): array
     {
@@ -88,7 +89,7 @@ final class OmnitrackerDegreeProgrammeRecords
     }
 
     /**
-     * @return SelectInputOption[] array
+     * @return SelectLabelInputOption[] array
      */
     public function getIssueYearSelectInputOptions(): array
     {
@@ -97,7 +98,7 @@ final class OmnitrackerDegreeProgrammeRecords
     }
 
     /**
-     * @return SelectInputOption[] array
+     * @return SelectLabelInputOption[] array
      */
     public function getCertificateSelectInputOptions(): array
     {
@@ -106,7 +107,7 @@ final class OmnitrackerDegreeProgrammeRecords
     }
 
     /**
-     * @return SelectInputOption[] array
+     * @return SelectLabelInputOption[] array
      */
     private function getSelectInputOptions(WeakMap $weakMap, array $objects): array
     {
@@ -122,7 +123,7 @@ final class OmnitrackerDegreeProgrammeRecords
                 /**
                  * @var ValueObjects\DependentSelectInputOption $dependentInputOption
                  */
-                $inputOptions[$dependentInputOption->choiceIndex] = ValueObjects\SelectInputOption::new(
+                $inputOptions[$dependentInputOption->choiceIndex] = ValueObjects\SelectLabelInputOption::new(
                     $dependentInputOption->choiceIndex,
                     $objects[$dependentInputOption->choiceIndex]->label
                 );
@@ -152,8 +153,8 @@ final class OmnitrackerDegreeProgrammeRecords
         echo "loadCertificateTypesDependentSelectInputOptions" . PHP_EOL;
         $selectInputOptions = [];
         foreach ($this->getCertificateTypesIssueYearRanges() as $certificateTypeIssueYearRange) {
-            $selectInputOptions[$certificateTypeIssueYearRange->certificateTypeId] = ValueObjects\DependentSelectInputOption::new(
-                $certificateTypeIssueYearRange->certificateTypeId,
+            $selectInputOptions[] = ValueObjects\DependentSelectInputOption::new(
+                (string) $certificateTypeIssueYearRange->certificateTypeId,
                 $this->getDependentSelectIndexForCertificateTypeIssueYearRange($certificateTypeIssueYearRange)
             );
         }
@@ -269,7 +270,7 @@ final class OmnitrackerDegreeProgrammeRecords
 
         $choiceOptions = [];
         foreach ($certificateTypes as $certificateType) {
-            $choiceOptions[$certificateType->id] = ValueObjects\SelectInputOption::new(
+            $choiceOptions[$certificateType->id] = ValueObjects\SelectLabelInputOption::new(
                 $certificateType->id,
                 $certificateType->label->localizedValues
             );
@@ -308,10 +309,7 @@ final class OmnitrackerDegreeProgrammeRecords
 
             $resultList[$item->UniqueId] = Certificate::new(
                 $item->UniqueId,
-                [ValueObjects\LocalizedStringValue::new(
-                    $querySettings->actionParameters->{ActionParameterName::LANGUAGE_CODE->value},
-                    $item->Title
-                )],
+                ValueObjects\Label::newGermanLabel($item->Title),
                 $item->GueltigAb,
                 $item->GueltigBis,
                 $item->TypUniqueId
@@ -359,10 +357,9 @@ final class OmnitrackerDegreeProgrammeRecords
         foreach ($collection as $item) {
             $resultList[$item->UniqueId] = CertificateType::new(
                 $item->UniqueId,
-                [ValueObjects\LocalizedStringValue::new(
-                    $querySettings->actionParameters->{ActionParameterName::LANGUAGE_CODE->value},
+                ValueObjects\Label::newGermanLabel(
                     $item->Title
-                )],
+                ),
                 $item->WohngemeindeErforderlich
             );
         }
@@ -424,7 +421,7 @@ final class OmnitrackerDegreeProgrammeRecords
         $maxYear = date('Y');
         $issueYears = [];
         for ($year = $minYear; $year <= $maxYear; $year++) {
-            $issueYears[$year] = Year::new((string)$year);
+            $issueYears[] = Year::new((string)$year);
         }
         return $issueYears;
     }
