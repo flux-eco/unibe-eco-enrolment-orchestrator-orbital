@@ -63,12 +63,18 @@ final class OmnitrackerHelpTableRecords
 
     public function getUniversityQualificationDependentSelects(): array
     {
-        $dependentSelects[] = $this->loadCertificateTypesDependentSelect();
+        $dependentSelects[] = $this->getCertificateTypesDependentSelect();
         foreach ($this->dependentIssueYearsSelect->getIterator() as $dependentSelect) {
-            $dependentSelects[] = $dependentSelect;
+            /**
+             * @var $dependentSelect ValueObjects\DependentInputSelect
+             */
+            $dependentSelects[$dependentSelect->selectIndex] = $dependentSelect;
         }
         foreach ($this->dependentCertificatesSelect->getIterator() as $dependentSelect) {
-            $dependentSelects[] = $dependentSelect;
+            /**
+             * @var $dependentSelect ValueObjects\DependentInputSelect
+             */
+            $dependentSelects[$dependentSelect->selectIndex] = $dependentSelect;
         }
         return $dependentSelects;
     }
@@ -106,8 +112,7 @@ final class OmnitrackerHelpTableRecords
     /**
      * @return SelectLabelInputOption[] array
      */
-    public
-    function getCertificateSelectInputOptions(): array
+    public function getCertificateSelectInputOptions(): array
     {
         echo "getCertificateSelectInputOptions" . PHP_EOL;
         return $this->getSelectInputOptions($this->dependentCertificatesInputOptions, $this->getCertificates(LanguageCode::DE));
@@ -229,8 +234,7 @@ final class OmnitrackerHelpTableRecords
         return $this->dependentCertificatesSelect[$certificateTypeIssueYearRange] ??= $this->loadCertificateDependentSelect($certificateTypeIssueYearRange);
     }
 
-    private
-    function loadCertificateDependentSelect(CertificateTypeIssueYearRange $certificateTypeIssueYearRange): ValueObjects\DependentInputSelect
+    private function loadCertificateDependentSelect(CertificateTypeIssueYearRange $certificateTypeIssueYearRange): ValueObjects\DependentInputSelect
     {
         echo "loadCertificateDependentSelect" . PHP_EOL;
         $this->currentDependentSelectIndex += 1;
@@ -255,11 +259,24 @@ final class OmnitrackerHelpTableRecords
         $selectInputOptions = [];
 
         foreach ($certificates as $certificate) {
+
+            echo "min ".  $certificateTypeIssueYearRange->minYear. PHP_EOL;
+            echo "max ".  $certificateTypeIssueYearRange->maxYear. PHP_EOL;
+            print_r($certificate). PHP_EOL;
+
+
             if ($certificate->certificateTypeId === $certificateTypeIssueYearRange->certificateTypeId
                 &&
                 (
-                    $certificate->minIssueYear >= $certificateTypeIssueYearRange->minYear
-                    || $certificate->maxIssueYear <= $certificateTypeIssueYearRange->maxYear
+                    (
+                        $certificate->minIssueYear <= $certificateTypeIssueYearRange->minYear
+                        && $certificate->minIssueYear <= $certificateTypeIssueYearRange->maxYear
+                    )
+                    &&
+                    (
+                        $certificate->maxIssueYear >=  $certificateTypeIssueYearRange->minYear
+                        && $certificate->maxIssueYear <= $certificateTypeIssueYearRange->maxYear
+                    )
                 )
             ) {
                 $selectInputOptions[] = ValueObjects\DependentSelectInputOption::new(
@@ -332,8 +349,7 @@ final class OmnitrackerHelpTableRecords
         return key_exists($certificateTypeId, $certificateTypes);
     }
 
-    public
-    function getCertificateType(int $certificateTypeId): CertificateType
+    public function getCertificateType(int $certificateTypeId): CertificateType
     {
         $certificateTypes = $this->getCertificateTypes(LanguageCode::DE);
         return $certificateTypes[$certificateTypeId];
@@ -358,8 +374,7 @@ final class OmnitrackerHelpTableRecords
     }
 
 
-    private
-    function loadCertificateTypes(QuerySettings $querySettings): array|object
+    private function loadCertificateTypes(QuerySettings $querySettings): array|object
     {
         $collection = json_decode($this->readCollection($querySettings)->{ObjectName::GET_CERTIFICATES_TYPES_RESULTS->value});
 
@@ -377,8 +392,7 @@ final class OmnitrackerHelpTableRecords
     /**
      * @return CertificateTypeIssueYearRange[]
      */
-    public
-    function getCertificateTypesIssueYearRanges(): array
+    public function getCertificateTypesIssueYearRanges(): array
     {
         $certificates = $this->getCertificates(LanguageCode::DE);
         foreach ($certificates as $certificate) {
@@ -393,8 +407,7 @@ final class OmnitrackerHelpTableRecords
         return $ranges;
     }
 
-    public
-    function getCertificateIssueYears(Certificate $certificate): array
+    public function getCertificateIssueYears(Certificate $certificate): array
     {
         if ($certificate->certificateTypeId === 0) {
             return [];
@@ -409,8 +422,7 @@ final class OmnitrackerHelpTableRecords
      * @param CertificateTypeIssueYearRange $yearRange
      * @return CertificateIssueYear[]
      */
-    private
-    function loadCertificateIssueYears(CertificateTypeIssueYearRange $yearRange): array
+    private function loadCertificateIssueYears(CertificateTypeIssueYearRange $yearRange): array
     {
         $minYear = $yearRange->minYear;
         $maxYear = $yearRange->maxYear;
@@ -426,8 +438,7 @@ final class OmnitrackerHelpTableRecords
     /**
      * @return Year[]
      */
-    private
-    function getIssueYears(): array
+    private function getIssueYears(): array
     {
         $minYear = date('Y') - 60;
         $maxYear = date('Y');
@@ -438,15 +449,13 @@ final class OmnitrackerHelpTableRecords
         return $issueYears;
     }
 
-    private
-    function readCollection(QuerySettings $querySettings): object|array
+    private function readCollection(QuerySettings $querySettings): object|array
     {
         $client = $this->newSoapClient();
         return $client->{$querySettings->actionName}($querySettings->actionParameters);
     }
 
-    private
-    function newSoapClient(): \SoapClient
+    private function newSoapClient(): \SoapClient
     {
         try {
             return new \SoapClient($this->binding->omnitrackerSoapServer->toString() . "/" . $this->wsdlFilePath,
@@ -456,8 +465,7 @@ final class OmnitrackerHelpTableRecords
         }
     }
 
-    private
-    function getDefaultActionParameters(LanguageCode $languageCode): object
+    private function getDefaultActionParameters(LanguageCode $languageCode): object
     {
         $actionParameters = new \stdClass();
         $actionParameters->{ActionParameterName::OT_PASSWORD->value} = $this->binding->omnitrackerCredentials->password;
@@ -468,8 +476,7 @@ final class OmnitrackerHelpTableRecords
         return $actionParameters;
     }
 
-    public
-    function writeReferenceObject(string $name, array|object $referenceObject): void
+    public function writeReferenceObject(string $name, array|object $referenceObject): void
     {
         $filePath = $this->configFilesDirectoryPath . "/reference-objects/" . $name . ".json";
         if (file_exists($filePath)) {

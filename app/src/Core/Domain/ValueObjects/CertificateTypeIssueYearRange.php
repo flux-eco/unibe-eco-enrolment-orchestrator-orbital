@@ -38,10 +38,10 @@ final class CertificateTypeIssueYearRange
         }
 
         $instance = self::$instances[$certificateTypeId];
-        if ($instance->minYear > $minYear) {
+        if ($instance->minYear >= $minYear) {
             $instance->minYear = $minYear;
         }
-        if ($instance->minYear < $maxYear) {
+        if ($instance->maxYear <= $maxYear) {
             $instance->maxYear = $maxYear;
         }
         self::$instances[$certificateTypeId] = $instance;

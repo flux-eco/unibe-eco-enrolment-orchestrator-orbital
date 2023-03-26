@@ -87,10 +87,13 @@ class HttpApi
 
         $requestData = json_decode($request->rawContent());
 
+        echo PHP_EOL;
+        echo $request->server['request_uri'];
+        print_r($currentPage);
         match ($request->server['request_uri']) {
             '/api/layout' => $this->service->provideLayout(Ports\IncomingMessages\ProvideLayout::new($this->config->valueObjectsConfigDirectoryPath), $this->publish($response)),
             '/api/get' => $this->service->providePage(Ports\IncomingMessages\ProvidePage::new($this->config->pageObjectDirectoryPath, $currentPage, $identificationNumber, $enrolmentData), $this->publish($response)),
-            '/api/post' => $this->service->storeData(Ports\IncomingMessages\StoreData::new(ValueObjects\PageName::from($requestData->page), $sessionId, $requestData->data, $enrolmentData), $this->publish($response))
+            '/api/post' => $this->service->storeData(Ports\IncomingMessages\StoreData::new(ValueObjects\PageName::from($requestData->page), $sessionId, $requestData->data, $enrolmentData), $this->publish($response)),
         };
 
 

@@ -1,7 +1,9 @@
 {
   "page": "identification-number",
   "data": {
-    "identification-number": ""
+    "identification-number": "",
+    "writable": false
   },
   "canBack": false
 }
+

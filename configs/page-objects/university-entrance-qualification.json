@@ -1,24 +1,76 @@
 {
+  "menu": {
+    "ids": [
+      "application-login"
+    ],
+    "id": "application-login"
+  },
   "page": "university-entrance-qualification",
   "data": {
     "data": [
       {
-        "$ref": "../reference-objects/cantons.json"
+        "$ref": "../reference-objects/certificate-types.json"
+      },
+      {
+        "$ref": "../reference-objects/certificates-issue-years.json"
       },
       {
         "$ref": "../reference-objects/certificates.json"
       },
       {
-        "$ref": "../reference-objects/certificate-types.json"
+        "$ref": "../reference-objects/cantons.json"
+      },
+      {
+        "$ref": "../reference-objects/schools.json"
       },
       {
         "$ref": "../reference-objects/countries.json"
       },
       {
-        "$ref": "../reference-objects/certificates-issue-years.json"
+        "$ref": "../reference-objects/places.json"
       }
     ],
+    "select-to-data": [
+      [
+        "certificate-type",
+        0
+      ],
+      [
+        "issue-year",
+        1
+      ],
+      [
+        "certificate",
+        2
+      ],
+      [
+        "matura-canton",
+        3
+      ],
+      [
+        "upper-secondary-school",
+        4
+      ],
+      [
+        "certificate-country",
+        5
+      ],
+      [
+        "certificate-canton",
+        3
+      ],
+      [
+        "certificate-place",
+        6
+      ]
+    ],
+    "selects": {
+      "$ref": "../reference-objects/university-qualification-selects.json"
+    },
+    "select-index": 0,
     "values": null
   },
-  "canBack": true
+  "user-name": "3432234",
+  "can-back": true,
+  "can-logout": true
 }

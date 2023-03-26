@@ -176,11 +176,13 @@ final class EnrolmentAggregate
 
     private function resolveReferences(object $pageObject, string $pageObjectDirectoryPath): object
     {
+        print_r($pageObject->data);
         foreach ($pageObject->data as $keyName => $value) {
             if ($keyName === '$ref') {
                 $pageObject->data = json_decode(file_get_contents($pageObjectDirectoryPath . "/" . $value));
             }
             if (is_object($value) && property_exists($value, '$ref')) {
+                echo $pageObjectDirectoryPath . "/" . $value->{'$ref'};
                 $pageObject->data->$keyName = json_decode(file_get_contents($pageObjectDirectoryPath . "/" . $value->{'$ref'}));
             }
             if ($keyName === "data") {

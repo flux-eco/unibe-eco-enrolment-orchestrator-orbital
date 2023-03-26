@@ -40,6 +40,13 @@ final readonly class Certificate
         int                $certificateTypeId
     ): self
     {
+        if ($minIssueYear < date('Y') - 60) {
+            $minIssueYear = date('Y') - 60;
+        }
+        if ($maxIssueYear > date('Y')) {
+            $maxIssueYear = date('Y');
+        }
+
         return new self(...get_defined_vars());
     }
 }
