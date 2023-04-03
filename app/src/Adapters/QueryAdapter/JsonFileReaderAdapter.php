@@ -49,8 +49,7 @@ final readonly class JsonFileReaderAdapter implements UniversityEntranceQualific
         ) {
             throw new \Exception("file path not valid " . $absoluteFilePath);
         }
-echo $jsonFileName;
-        echo $absoluteFilePath;
+
         if (!is_readable($absoluteFilePath)) {
             throw new \Exception("File is not readable: " . $absoluteFilePath);
         }
