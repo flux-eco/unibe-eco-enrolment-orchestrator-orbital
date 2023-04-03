@@ -53,8 +53,8 @@ final class InputsProvider
     {
         $optionLists = [
             ...InputsAdapter\OptionList::newWithOptionItemTransformation($inputSchemas->certificateTypes->optionItemListIndex, $rawData->certificateTypes, fn($object) => InputsAdapter\Option::fromDataObject($object, "id", "label"))->jsonSerialize(),
-            ...InputsAdapter\OptionList::newWithOptionItemTransformation($inputSchemas->certificatesIssueYears->optionItemListIndex, $rawData->issueYears, fn($object) => InputsAdapter\Option::fromDataObject($object, "id"))->jsonSerialize(),
-            ...InputsAdapter\OptionList::newWithOptionItemTransformation($inputSchemas->certificates->optionItemListIndex, $rawData->certificates, fn($object) => InputsAdapter\ption::fromDataObject($object, "id", "label"))->jsonSerialize(),
+            ...InputsAdapter\OptionList::newWithOptionItemTransformation($inputSchemas->certificatesIssueYears->optionItemListIndex, $rawData->certificateIssueYears, fn($object) => InputsAdapter\Option::fromDataObject($object, "id"))->jsonSerialize(),
+            ...InputsAdapter\OptionList::newWithOptionItemTransformation($inputSchemas->certificates->optionItemListIndex, $rawData->certificates, fn($object) => InputsAdapter\Option::fromDataObject($object, "id", "label"))->jsonSerialize(),
             ...InputsAdapter\OptionList::newWithOptionItemTransformation($inputSchemas->maturaCanton->optionItemListIndex, $rawData->cantons, fn($object) => InputsAdapter\Option::fromDataObject($object, "id", "label"))->jsonSerialize(),
             ...InputsAdapter\OptionList::newWithOptionItemTransformation($inputSchemas->upperSecondarySchool->optionItemListIndex, $rawData->schools, fn($object) => InputsAdapter\Option::fromDataObject($object, "id", "label"))->jsonSerialize(),
             ...InputsAdapter\OptionList::newWithOptionItemTransformation($inputSchemas->certificateCountries->optionItemListIndex, $rawData->countries, fn($object) => InputsAdapter\Option::fromDataObject($object, "id", "label"))->jsonSerialize(),
@@ -86,14 +86,26 @@ final class InputsProvider
                                         $this->loadOptionListDependency(
                                             $inputSchemas->maturaCanton->inputName,
                                             array_map(fn(array $school): array => [$school["id"],
-                                                $this->getCountryDependentSelectIndex($rawData)
+                                                $this->getCountryDependentSelectIndex($rawData, $inputSchemas)
                                             ], array_values(array_filter($rawData->schools, fn(array $school): bool => $rawData->schoolCanton[$school['id']] === $canton['id'] && in_array($raw_certificate['id'], $rawData->schoolCertificates[$school['id']])))))], array_values($rawData->cantons))
-                                )], array_values(array_filter($rawData->certificates, fn(array $raw_certificate): bool => $raw_certificate["certificateTypeId"] === $certificate_type["id"] && array_search($issue_year, $this->extractIssueYearsFromCertificates([$rawData->certificates]), true) !== false)))
+                                )], array_values(array_filter($rawData->certificates, fn(array $raw_certificate): bool => $raw_certificate["certificateTypeId"] === $certificate_type["id"] && array_search($issue_year,
+                                    $this->extractIssueYearsFromCertificates([$rawData->certificates]), true) !== false)))
                         )], $this->extractIssueYearsFromCertificates(array_values(array_filter($rawData->certificates, fn(array $raw_certificate): bool => $raw_certificate["certificateTypeId"] === $certificate_type["id"]))))
                 )], array_values($rawData->certificateTypes))
         );
         $this->writeJsonData($this->optionListsDependenciesJsonFileName, $this->optionListsDependencies);
         $this->writeJsonData($this->optionListsDependenciesInitialIndexJsonFileName, [$select_index]);
+    }
+
+    function extractIssueYearsFromCertificates(array $raw_certificates) : array {
+        $issue_years = [];
+        foreach ($raw_certificates as $raw_certificate) {
+            for ($issue_year = $raw_certificate["minIssueYear"]; $issue_year <= $raw_certificate["maxIssueYear"]; $issue_year++) {
+                $issue_years[] = strval($issue_year);
+            }
+        }
+        sort($issue_years);
+        return array_values(array_unique($issue_years));
     }
 
 
@@ -108,26 +120,27 @@ final class InputsProvider
     }
 
 
-    private function getCountryDependentSelectIndex(Data\RawData $rawData): int
+    private function getCountryDependentSelectIndex(Data\RawData $rawData, Schemas\InputSchemas $inputSchemas): int
     {
         return $this->loadOptionListDependency(
-            "certificate-country",
+            $inputSchemas->certificateCountries->inputName,
             array_map(fn(array $country): array => [
                 $country->id,
-                $this->getCantonsDependentSelectIndex($rawData, $country)
+                $this->getCantonsDependentSelectIndex($rawData, $inputSchemas, $country)
             ], array_values($rawData->countries))
         );
     }
 
     private function getCantonsDependentSelectIndex(Data\RawData         $rawData,
+                                                    Schemas\InputSchemas $inputSchemas,
                                                     InputsAdapter\Option $country): ?int
     {
         if ($country["id"] === $rawData->countrySwitzerlandUniqueId) {
             return $this->loadOptionListDependency(
-                "certificate-canton",
+                $inputSchemas->certificateCanton->inputName,
                 array_map(fn(array $canton): array => [
                     $canton["id"],
-                    $this->getCantonMuncipalitiesDependendSelectIndex($rawData, $canton)
+                    $this->getCantonMuncipalitiesDependendSelectIndex($rawData, $inputSchemas, $canton)
                 ], array_values($rawData->cantons)
                 ));
         }
@@ -135,25 +148,28 @@ final class InputsProvider
     }
 
     private function getCantonMuncipalitiesDependendSelectIndex(Data\RawData         $rawData,
+                                                                Schemas\InputSchemas $inputSchemas,
                                                                 InputsAdapter\Option $canton): ?int
     {
         if (array_key_exists($canton["id"], $rawData->cantonMuncipalities) === false) {
             return null;
         }
         return $this->loadOptionListDependency(
-            "certificate-place",
+            $inputSchemas->municipalities->inputName,
             array_values($rawData->cantonMuncipalities[$canton["id"]])
         );
     }
 
+    /**
+     * @throws Exception
+     */
     private function writeJsonData(string $jsonFileName, JsonSerializable|array $data): void
     {
         $filePath = $this->getAbsoluteFilePath($jsonFileName);
         if (file_exists($filePath)) {
             unlink($filePath);
         }
-        $jsonDocument = fopen($filePath, "w");
-        fwrite($jsonDocument, json_encode(($data instanceof JsonSerializable) ? $data->jsonSerialize() : $data));
+        file_put_contents($this->getAbsoluteFilePath($jsonFileName), json_encode($data));
     }
 
     /**

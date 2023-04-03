@@ -43,11 +43,16 @@ final readonly class JsonFileReaderAdapter implements UniversityEntranceQualific
 
         $absoluteFilePath = realpath(implode("/", [$directoryPath, $jsonFileName]));
 
+
         if (str_contains($absoluteFilePath, "..")
             || str_contains($absoluteFilePath, "//") !== false
             || str_contains($absoluteFilePath, "\\") !== false
         ) {
             throw new \Exception("file path not valid " . $absoluteFilePath);
+        }
+
+        if (!file_exists($absoluteFilePath)) {
+            throw new \Exception("File not found: " . $absoluteFilePath);
         }
 
         if (!is_readable($absoluteFilePath)) {
@@ -67,10 +72,6 @@ final readonly class JsonFileReaderAdapter implements UniversityEntranceQualific
     public function readJsonFile(string $absoluteJsonFilePath): array|object
     {
         $filePath = $this->getAbsoluteFilePath(pathinfo($absoluteJsonFilePath, PATHINFO_DIRNAME), pathinfo($absoluteJsonFilePath, PATHINFO_BASENAME));
-
-        if (!file_exists($filePath)) {
-            throw new \Exception("File not found: " . $filePath);
-        }
 
         $json = file_get_contents($filePath);
         $decodedJson = json_decode($json);
