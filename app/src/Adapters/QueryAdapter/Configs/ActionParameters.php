@@ -1,8 +1,7 @@
 <?php
 
 namespace UnibeEco\EnrolmentOrchestratorOrbital\Adapters\QueryAdapter\Configs;
-
-use UnibeEco\EnrolmentOrchestratorOrbital\Configs;
+use UnibeEco\EnrolmentOrchestratorOrbital\Adapters\QueryAdapter\Types;
 use stdClass;
 
 final readonly class ActionParameters
@@ -21,15 +20,15 @@ final readonly class ActionParameters
 
 
     public static function new(
-        Configs\SoapServerSettings $soapServerSettings,
+        Types\SoapServerSettings $soapServerSettings,
         string                     $omnitrackerServerHost,
         string                     $defaultLanguageCode = "de"
     )
     {
         $actionParameters = new stdClass();
         $actionParameters->{"pOTServer"} = $omnitrackerServerHost;
-        $actionParameters->{"pOTUser"} = $soapServerSettings->soapUser;
-        $actionParameters->{"pOTPassword"} = $soapServerSettings->soapPassword;
+        $actionParameters->{"pOTUser"} = $soapServerSettings->getSoapUser();
+        $actionParameters->{"pOTPassword"} = $soapServerSettings->getSoapPassword();
         $actionParameters->{"pLanguagecode"} = $defaultLanguageCode;
 
 
@@ -45,8 +44,6 @@ final readonly class ActionParameters
             $actionParameters
         );
     }
-
-
 }
 
 

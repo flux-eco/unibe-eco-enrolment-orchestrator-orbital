@@ -2,13 +2,13 @@
 
 namespace UnibeEco\EnrolmentOrchestratorOrbital\Adapters\QueryAdapter\Configs;
 
-use UnibeEco\EnrolmentOrchestratorOrbital\Configs;
+use UnibeEco\EnrolmentOrchestratorOrbital\Adapters\QueryAdapter\Types;
 
 class Settings
 {
     private function __construct(
-        public Configs\SoapServerSettings $soapServerSettings,
-        public string     $omnitrackerServerHost,
+        public Types\SoapServerSettings $soapServerSettings,
+        public string $omnitrackerServerHost,
         public ActionParameters           $actionParameters
     )
     {
@@ -16,7 +16,7 @@ class Settings
     }
 
     public static function new(
-        Configs\SoapServerSettings $soapServerSettings,
+        Types\SoapServerSettings $soapServerSettings,
         string $omnitrackerServerHost,
     ): self
     {

@@ -1,9 +1,10 @@
 <?php
 
 namespace UnibeEco\EnrolmentOrchestratorOrbital\Pages\UniversityEntranceQualification\Data;
+use UnibeEco\EnrolmentOrchestratorOrbital\Pages\UniversityEntranceQualification;
+use UnibeEco\EnrolmentOrchestratorOrbital\Pages\UniversityEntranceQualification\Types\Label;
 
-
-final readonly class School
+final readonly class School implements UniversityEntranceQualification\Types\School
 {
     private function __construct(
         public string             $id,
@@ -30,5 +31,30 @@ final readonly class School
     ): self
     {
         return new self($id, $label, $schoolTypeId, $certificateId, $cantonId);
+    }
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function getLabel(): Label
+    {
+        return $this->label;
+    }
+
+    public function getSchoolTypeId(): string
+    {
+        return $this->schoolTypeId;
+    }
+
+    public function getCertificateId(): string
+    {
+        return $this->certificateId;
+    }
+
+    public function getCantonId(): string
+    {
+        return $this->cantonId;
     }
 }

@@ -1,13 +1,14 @@
 <?php
 
 namespace UnibeEco\EnrolmentOrchestratorOrbital\Pages\UniversityEntranceQualification\Data;
+use UnibeEco\EnrolmentOrchestratorOrbital\Pages\Portrait\Types\Label;
+use UnibeEco\EnrolmentOrchestratorOrbital\Pages\UniversityEntranceQualification;
 
-
-final readonly class Canton
+final readonly class Canton implements UniversityEntranceQualification\Types\Canton
 {
     /**
      * @param string $id
-     * @param array $label
+     * @param Label $label
      */
     private function __construct(
         public string $id,
@@ -28,5 +29,15 @@ final readonly class Canton
     ): self
     {
         return new self($id, $label);
+    }
+
+    public function getId(): string
+    {
+       return $this->id;
+    }
+
+    public function getLabel(): Label
+    {
+        return $this->label;
     }
 }

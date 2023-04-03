@@ -1,10 +1,10 @@
 <?php
 
-
 namespace UnibeEco\EnrolmentOrchestratorOrbital\Pages\UniversityEntranceQualification\Data;
+use UnibeEco\EnrolmentOrchestratorOrbital\Pages\UniversityEntranceQualification;
+use UnibeEco\EnrolmentOrchestratorOrbital\Pages\UniversityEntranceQualification\Types\Label;
 
-
-final readonly class CertificateType
+final readonly class CertificateType implements UniversityEntranceQualification\Types\CertificateType
 {
     /**
      * @param string $id
@@ -33,5 +33,20 @@ final readonly class CertificateType
     ): self
     {
         return new self($id, $label, $municipalityRequired);
+    }
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function getLabel(): Label
+    {
+        return $this->label;
+    }
+
+    public function getMunicipalityRequired(): bool
+    {
+        return $this->municipalityRequired;
     }
 }

@@ -1,8 +1,9 @@
 <?php
-
-
 namespace UnibeEco\EnrolmentOrchestratorOrbital\Pages\UniversityEntranceQualification\Data;
-final readonly class Locality
+use UnibeEco\EnrolmentOrchestratorOrbital\Pages\UniversityEntranceQualification;
+use UnibeEco\EnrolmentOrchestratorOrbital\Pages\UniversityEntranceQualification\Types\Label;
+
+final readonly class Locality implements UniversityEntranceQualification\Types\Locality
 {
     /**
      * @param string $id
@@ -35,5 +36,25 @@ final readonly class Locality
     ): self
     {
         return new self($id, $label, $plz, $cantonId);
+    }
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function getLabel(): Label
+    {
+        return $this->label;
+    }
+
+    public function getPlz(): int
+    {
+        return $this->plz;
+    }
+
+    public function getCantonId(): string
+    {
+        return $this->cantonId;
     }
 }

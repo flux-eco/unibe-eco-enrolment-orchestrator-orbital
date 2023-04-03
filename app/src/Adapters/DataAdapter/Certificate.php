@@ -1,10 +1,9 @@
 <?php
 
+namespace UnibeEco\EnrolmentOrchestratorOrbital\Adapters\DataAdapter;
+use UnibeEco\EnrolmentOrchestratorOrbital\Pages\UniversityEntranceQualification;
 
-namespace UnibeEco\EnrolmentOrchestratorOrbital\Pages\UniversityEntranceQualification\Data;
-
-
-final readonly class Certificate
+final readonly class Certificate implements UniversityEntranceQualification\Types\Certificate
 {
     /**
      * @param string $id
@@ -49,4 +48,46 @@ final readonly class Certificate
 
         return new self(...get_defined_vars());
     }
+
+    /**
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return Label
+     */
+    public function getLabel(): Label
+    {
+        return $this->label;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMinIssueYear(): int
+    {
+        return $this->minIssueYear;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxIssueYear(): int
+    {
+        return $this->maxIssueYear;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCertificateTypeId(): int
+    {
+        return $this->certificateTypeId;
+    }
+
+
 }

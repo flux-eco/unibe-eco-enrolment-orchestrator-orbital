@@ -3,8 +3,9 @@
 namespace UnibeEco\EnrolmentOrchestratorOrbital\Adapters\DataAdapter;
 
 use UnibeEco\EnrolmentOrchestratorOrbital\Pages\UniversityEntranceQualification;
+use UnibeEco\EnrolmentOrchestratorOrbital\Pages\Portrait;
 
-final readonly class Label implements UniversityEntranceQualification\Data\Label
+final readonly class Label implements UniversityEntranceQualification\Types\Label, Portrait\Types\Label
 {
     private function __construct(
         public ?string $de,
