@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "$id": "https://flux-eco.fluxlabs.ch/schemas/content-schemas/flux-eco-content-type-schema.json",
+  "title": "FluxEcoContentType",
+  "type": "string",
+  "enum": [
+    "text/plain",
+    "text/html",
+    "text/css",
+    "text/javascript",
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+    "application/javascript",
+    "application/pdf",
+    "application/json",
+    "application/xml",
+    "application/zip",
+    "application/font-woff",
+    "application/font-ttf",
+    "application/geo"
+  ]
+}

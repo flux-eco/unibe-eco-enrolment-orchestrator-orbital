@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://flux-eco.fluxlabs.ch/schemas/flux-eco-resource-identifier-schema.json",
+  "title": "FluxEcoResourceIdentifier",
+  "type": "object",
+  "properties": {
+    "idPath": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "idPath"
+  ]
+}

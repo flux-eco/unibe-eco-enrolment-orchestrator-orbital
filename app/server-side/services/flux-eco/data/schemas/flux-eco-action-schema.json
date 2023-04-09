@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://flux-eco.fluxlabs.ch/schemas/flux-eco-action-schema.json",
+  "title": "FluxEcoActionSchema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "path": {
+      "type": "string"
+    },
+    "parameters": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z0-9._-]+$": {
+          "type": "object",
+          "properties": {
+            "in": {
+              "type": "string",
+              "enum": [
+                "path",
+                "query",
+                "methodParameter"
+              ]
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "string",
+                "number",
+                "object",
+                "array"
+              ]
+            }
+          },
+          "required": [
+            "in",
+            "type"
+          ]
+        }
+      }
+    },
+    "response": {
+      "type": "object",
+      "properties": {
+        "contentType": {
+          "$ref": "flux-eco-content-type-schema.json"
+        },
+        "data": {
+        }
+      }
+    }
+  }
+}

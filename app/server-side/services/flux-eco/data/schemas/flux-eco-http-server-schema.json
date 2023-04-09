@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "$id": "https://flux-eco.fluxlabs.ch/schemas/flux-eco-http-server-schema.json",
+  "title": "flux-eco-http-server-schema",
+  "type": "object",
+  "properties": {
+    "port": {
+      "type": "string",
+      "default": "${SERVER_PORT}"
+    },
+    "host": {
+      "type": "string",
+      "default": "${SERVER_HOST}"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "port",
+    "host"
+  ]
+}

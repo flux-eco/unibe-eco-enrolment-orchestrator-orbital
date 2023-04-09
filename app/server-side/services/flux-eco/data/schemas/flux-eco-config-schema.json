@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://flux-eco.fluxlabs.ch/schemas/flux-eco-app-config-schema.json",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^flux-eco-[a-z]+(-[a-z]+)*$"
+    },
+    "id": {
+      "type": "string"
+    },
+    "actions": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "flux-eco-action-schema.json"
+      }
+    },
+    "filePaths": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "flux-eco-file-path-schema.json"
+      }
+    },
+    "settings": {
+       "type": "object"
+    },
+    "initialState": {
+      "type": "object"
+    },
+    "outbounds": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}

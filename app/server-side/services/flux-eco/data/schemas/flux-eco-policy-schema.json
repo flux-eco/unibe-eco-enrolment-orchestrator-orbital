@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "$id": "https://flux-eco.fluxlabs.ch/schemas/flux-eco-http-policy-schema.json",
+  "title": "FluxEcoHttpPolicy",
+  "type": "object",
+  "properties": {
+    "path": {
+      "type": "string"
+    },
+    "requiredHeaders": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Content-Type",
+          "Authorization",
+          "X-Requested-With",
+          "Accept",
+          "Origin",
+          "Access-Control-Request-Method",
+          "Access-Control-Request-Headers",
+          "Cache-Control",
+          "User-Agent",
+          "x-flux-ilias-rest-api-user-id"
+        ]
+      }
+    },
+    "allowedHeaders": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Content-Type",
+          "Authorization",
+          "X-Requested-With",
+          "Accept",
+          "Origin",
+          "Access-Control-Request-Method",
+          "Access-Control-Request-Headers",
+          "Cache-Control",
+          "User-Agent"
+        ]
+      }
+    },
+    "allowedIps": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://flux-eco.fluxlabs.ch/schemas/flux-eco-file-path-schema.json",
+  "title": "FluxEcoFilePathSchema",
+  "type": "object",
+  "properties": {
+    "pathType": {
+      "type": "string",
+      "enum": [
+        "file",
+        "path"
+      ]
+    },
+    "contentType": {
+      "$ref": "flux-eco-content-type-schema.json"
+    }
+  },
+  "required": [
+    "contentType", "pathType"
+  ]
+}
