@@ -1,7 +1,9 @@
 <?php
 namespace FluxEco\UnibeOmnitrackerClient\Types\ResponseData;
 
-final readonly class Label
+use JsonSerializable;
+
+final readonly class Label implements JsonSerializable
 {
     private function __construct(
         public ?string $de,
@@ -27,5 +29,10 @@ final readonly class Label
     ): self
     {
         return new self($de, $en);
+    }
+
+    public function jsonSerialize(): array
+    {
+        return get_object_vars($this);
     }
 }

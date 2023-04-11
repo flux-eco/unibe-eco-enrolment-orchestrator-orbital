@@ -2,7 +2,9 @@
 
 namespace FluxEco\UnibeOmnitrackerClient\Types\ResponseData;
 
-class Locality
+use JsonSerializable;
+
+class Locality implements JsonSerializable
 {
     /**
      * @param string $id
@@ -11,9 +13,9 @@ class Locality
      * @param string $cantonId
      */
     private function __construct(
-        public string             $id,
-        public Label $label,
-        public int $plz,
+        public string $id,
+        public Label  $label,
+        public int    $plz,
         public string $cantonId
     )
     {
@@ -28,12 +30,21 @@ class Locality
      * @return static
      */
     public static function new(
-        string             $id,
-        Label $label,
-        int                $plz,
-        string             $cantonId
+        string $id,
+        Label  $label,
+        int    $plz,
+        string $cantonId
     ): self
     {
         return new self($id, $label, $plz, $cantonId);
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return [
+            "id" => $this->id,
+            "postal-code" => $this->plz,
+            "label" => $this->label
+        ];
     }
 }

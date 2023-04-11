@@ -42,10 +42,10 @@ final readonly class RequestActions
     public function getListStudienberechtigungsausweis(): FluxEcoRequestAction
     {
         return FluxEcoRequestAction::new(
-            $this->actionsDefinition->getListStudienberechtigungsausweis->name,
-            $this->createFullActionPath($this->actionsDefinition->getListStudienberechtigungsausweis->path),
+            $this->actionsDefinition->GetListStudienberechtigungsausweis->name,
+            $this->createFullActionPath($this->actionsDefinition->GetListStudienberechtigungsausweis->path),
             $this->defaultParameters,
-            $this->actionsDefinition->getListStudienberechtigungsausweis->responseDefinition
+            $this->actionsDefinition->GetListStudienberechtigungsausweis->responseDefinition
         );
     }
 
@@ -55,50 +55,50 @@ final readonly class RequestActions
         $parameters['pType'] = 1;
 
         return FluxEcoRequestAction::new(
-            $this->actionsDefinition->getListStudienberechtigungsausweistyp->name,
-            $this->createFullActionPath($this->actionsDefinition->getListStudienberechtigungsausweistyp->path),
+            $this->actionsDefinition->GetListStudienberechtigungsausweistyp->name,
+            $this->createFullActionPath($this->actionsDefinition->GetListStudienberechtigungsausweistyp->path),
             $parameters,
-            $this->actionsDefinition->getListStudienberechtigungsausweistyp->responseDefinition
+            $this->actionsDefinition->GetListStudienberechtigungsausweistyp->responseDefinition
         );
     }
 
     public function getListKanton(): FluxEcoRequestAction
     {
         return FluxEcoRequestAction::new(
-            $this->actionsDefinition->getListKanton->name,
-            $this->createFullActionPath($this->actionsDefinition->getListKanton->path),
+            $this->actionsDefinition->GetListKanton->name,
+            $this->createFullActionPath($this->actionsDefinition->GetListKanton->path),
             $this->defaultParameters,
-            $this->actionsDefinition->getListKanton->responseDefinition
+            $this->actionsDefinition->GetListKanton->responseDefinition
         );
     }
 
     public function getListGemeinde(): FluxEcoRequestAction
     {
         return FluxEcoRequestAction::new(
-            $this->actionsDefinition->getListGemeinde->name,
-            $this->createFullActionPath($this->actionsDefinition->getListGemeinde->path),
+            $this->actionsDefinition->GetListGemeinde->name,
+            $this->createFullActionPath($this->actionsDefinition->GetListGemeinde->path),
             $this->defaultParameters,
-            $this->actionsDefinition->getListGemeinde->responseDefinition
+            $this->actionsDefinition->GetListGemeinde->responseDefinition
         );
     }
 
     public function getListSchuleMaturitaet():FluxEcoRequestAction
     {
         return FluxEcoRequestAction::new(
-            $this->actionsDefinition->getListSchuleMaturitaet->name,
-            $this->createFullActionPath($this->actionsDefinition->getListSchuleMaturitaet->path),
+            $this->actionsDefinition->GetListSchuleMaturitaet->name,
+            $this->createFullActionPath($this->actionsDefinition->GetListSchuleMaturitaet->path),
             $this->defaultParameters,
-            $this->actionsDefinition->getListSchuleMaturitaet->responseDefinition
+            $this->actionsDefinition->GetListSchuleMaturitaet->responseDefinition
         );
     }
 
     public function getListStaat(): FluxEcoRequestAction
     {
         return FluxEcoRequestAction::new(
-            $this->actionsDefinition->getListStaat->name,
-            $this->createFullActionPath($this->actionsDefinition->getListStaat->path),
+            $this->actionsDefinition->GetListStaat->name,
+            $this->createFullActionPath($this->actionsDefinition->GetListStaat->path),
             $this->defaultParameters,
-            $this->actionsDefinition->getListStaat->responseDefinition
+            $this->actionsDefinition->GetListStaat->responseDefinition
         );
     }
 

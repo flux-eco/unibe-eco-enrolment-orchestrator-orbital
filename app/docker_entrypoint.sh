@@ -1,9 +1,9 @@
 #!/bin/sh
 set -e
 
-function install {
-  php cli/createEnrolmentConfiguration.php
+function configure {
+  php server-side/configure.php
 }
 
-install
+configure
 flux-eco-http-synapse.start

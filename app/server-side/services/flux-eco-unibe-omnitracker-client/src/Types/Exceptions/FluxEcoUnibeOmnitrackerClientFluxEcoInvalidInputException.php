@@ -1,0 +1,7 @@
+<?php
+
+namespace FluxEco\UnibeOmnitrackerClient\Types\Exceptions;
+use FluxEcoType\FluxEcoExceptionDefinitions;
+class FluxEcoUnibeOmnitrackerClientFluxEcoInvalidInputException extends FluxEcoExceptionDefinitions\FluxEcoInvalidInputException {
+
+}

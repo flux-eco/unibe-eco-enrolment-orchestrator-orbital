@@ -63,7 +63,7 @@ class Api
         }
 
         if (!in_array(fileowner($absoluteFilePath), $this->allowedUsers)) {
-            throw new Exception("Access denied: " . $absoluteFilePath);
+            throw new Exception("Access denied: " . $absoluteFilePath. "file owner ".fileowner($absoluteFilePath). " allowed users ".print_r($this->allowedUsers, true));
         }
 
         return $absoluteFilePath;
@@ -123,7 +123,7 @@ class Api
     }
 
 
-    public function writeJsonFile($absoluteFilePath, JsonSerializable|array $data): void
+    public function writeJsonFile($absoluteFilePath, object|array $data): void
     {
         if (str_contains($absoluteFilePath, "..")
             || str_contains($absoluteFilePath, "//") !== false

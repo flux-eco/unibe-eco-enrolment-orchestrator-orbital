@@ -8,8 +8,10 @@ use FluxEcoType\Workflow;
 final readonly class Settings
 {
     public EnrolmentDefinition $enrolmentDefinition;
+
     private function __construct(
-        public DataDirectories      $dataDirectories,
+        public DataDirectories $dataDirectories,
+        public bool            $debug,
 
     )
     {
@@ -17,13 +19,14 @@ final readonly class Settings
     }
 
     public static function new(
-
+        bool $debug = false
     ): self
     {
         return new self(
-           DataDirectories::new(
-               getenv('FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_DATA_DIRECTORY_PATH')
-           )
+            DataDirectories::new(
+                getenv('FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_DATA_DIRECTORY_PATH')
+            ),
+            $debug
         );
     }
 }

@@ -17,7 +17,7 @@ final readonly class Config
     ): self
     {
         return new self(
-            Types\Settings::new(),
+            Types\Settings::new(true),
             $outbounds
         );
     }

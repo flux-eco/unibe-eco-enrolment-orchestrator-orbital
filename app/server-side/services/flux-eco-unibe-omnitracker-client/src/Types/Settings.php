@@ -16,6 +16,7 @@ final readonly class Settings
         public FluxEcoBasicCredentials                   $omnitrackerCredentials,
         public string                                    $omnitrackerServerHost,
         public DefaultParametersDefinition               $defaultActionParameterDefinitions,
+        public array                                     $degreeProgramSubjectFilter,
         public string                                    $defaultLanguageCode = "de"
     )
     {
@@ -32,6 +33,10 @@ final readonly class Settings
     {
         $actionsDefinition = UnibeOmnitrackerSoapApi\ActionsDefinition::new($baseDataItemDefinition);
 
+        $degreeProgramSubjectFilter[] = UnibeOmnitrackerSoapApi\DegreeProgramBfsCodeMapping::new( 745096, [15,16]); //bachelor
+        $degreeProgramSubjectFilter[] = UnibeOmnitrackerSoapApi\DegreeProgramBfsCodeMapping::new(  745097, [25]); //master
+        $degreeProgramSubjectFilter[] = UnibeOmnitrackerSoapApi\DegreeProgramBfsCodeMapping::new(  745099, [56]); //minormob bachelor
+
         return new self(
             $soapBindingDefinition,
             $omnitrackerCredentials,
@@ -39,6 +44,7 @@ final readonly class Settings
             $omnitrackerCredentials,
             $omnitrackerServerHost,
             DefaultParametersDefinition::new(),
+            $degreeProgramSubjectFilter,
             $defaultLanguageCode
         );
     }

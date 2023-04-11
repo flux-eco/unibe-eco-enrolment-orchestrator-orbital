@@ -12,7 +12,7 @@ class FluxEcoActionDefinition
      * @param string $name
      * @param string|Closure $path - The path can either be a string indicating the action path,
      * such as an HTTP request action, or a closure that takes the defined parameters in this definition as parameters.
-     * @param ?object $parametersDefinition - An object with properties of type FluxEcoDataDefinition.
+     * @param ?object $parametersDefinition - An object with properties of type FluxEcoAttributeDefinition.
      * @param ?FluxEcoResponseDefinition $responseDefinition
      */
     private function __construct(

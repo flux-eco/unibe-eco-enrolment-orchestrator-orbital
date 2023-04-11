@@ -25,9 +25,9 @@ final readonly class Outbounds implements OutboundsActionsProcessor
         return $this->actionProcessor->processReadCurrentPage($transactionStateObject);
     }
 
-    public function processStoreRequestContent(FluxEcoTransactionStateObject $transactionStateObject, object $dataToProcess): object
+    public function processStoreRequestContent(string $currentPage, FluxEcoTransactionStateObject $transactionStateObject, object $dataToProcess): object
     {
-        return $this->actionProcessor->processStoreRequestContent($transactionStateObject, $dataToProcess);
+        return $this->actionProcessor->processStoreRequestContent($currentPage, $transactionStateObject, $dataToProcess);
     }
 
     public function processReadLayout(): string

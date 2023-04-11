@@ -10,7 +10,7 @@ interface OutboundsActionsProcessor
 
     public function processReadCurrentPage(FluxEcoTransactionStateObject $transactionStateObject): string;
 
-    public function processStoreRequestContent(FluxEcoTransactionStateObject $transactionStateObject, object $dataToProcess): object;
+    public function processStoreRequestContent(string $currentPage, FluxEcoTransactionStateObject $transactionStateObject, object $dataToProcess): object;
 
     public function processReadLayout(): string;
 }

@@ -3,6 +3,9 @@
 namespace FluxEco\HttpWorkflowRequestHandler;
 
 use Exception;
+use FluxEco\UnibeOmnitrackerClient\Types\Exceptions\FluxEcoUnibeOmnitrackerClientFluxEcoInvalidInputException;
+use FluxEcoType\FluxEcoContentType;
+use FluxEcoType\FluxEcoExceptionDefinitions\FluxEcoException;
 use FluxEcoType\FluxEcoHttpStatusCode;
 use FluxEcoType\FluxEcoTransactionResponse;
 use FluxEcoType\FluxEcoTransactionStateObject;
@@ -27,14 +30,51 @@ final readonly class Api
 
     public function handleHttpRequest(\Swoole\Http\Request $request, \Swoole\Http\Response $response, \Swoole\Table $transactionDataCache): void
     {
-        $transactionId = $this->readCurrentTransactionId($request, $response);
-        $transactionStateObject = $this->createTransactionStateObject($transactionId, $transactionDataCache);
+        $clientSideContextExceptions = [];
+        $serverSideContextExceptions = [];
 
-        match ($request->server['request_uri']) {
-            '/api/layout' => $this->publish($response, $this->config->outbounds->processReadLayout()),
-            '/api/get' => $this->handleGet($response, $transactionStateObject),
-            '/api/post' => $this->handlePost($request, $response, $transactionDataCache, $transactionStateObject)
-        };
+        //todo separate exception handling
+        $transactionId = $this->readCurrentTransactionId($request, $response);
+        try {
+            $transactionStateObject = $this->createTransactionStateObject($transactionId, $transactionDataCache);
+            match ($request->server['request_uri']) {
+                '/api/layout' => $this->publish($response, $this->config->outbounds->processReadLayout()),
+                '/api/get' => $this->handleGet($response, $transactionStateObject),
+                '/api/post' => $this->handlePost($request, $response, $transactionDataCache, $transactionStateObject)
+            };
+        } catch (FluxEcoException $e) {
+            if ($e->usableInClientSideContext === true) {
+                $clientSideContextExceptions[] = $e->getMessage();
+            }
+        } catch (Exception $e) {
+            $serverSideContextExceptions[] = $e;
+        }
+
+        if (count($clientSideContextExceptions) > 0) {
+            $response->header('Content-Type', 'application/json');
+            $response->status(FluxEcoHttpStatusCode::BAD_REQUEST->value);
+            $response->end(FluxEcoTransactionResponse::new(
+                $transactionId,
+                "",
+                false,
+                $clientSideContextExceptions
+            )->toJson());
+        }
+
+        if (count($serverSideContextExceptions) > 0) {
+            print_r($serverSideContextExceptions);
+
+            $response->header('Content-Type', 'application/json'); //todo
+            $response->status(FluxEcoHttpStatusCode::BAD_REQUEST->value);
+            $response->end(FluxEcoTransactionResponse::new(
+                $transactionId,
+                "",
+                false,
+                ["Server Error"]
+            ));
+        }
+
+
     }
 
     private function createTransactionStateObject(string $transactionId, \Swoole\Table $transactionDataCache): FluxEcoTransactionStateObject
@@ -66,13 +106,15 @@ final readonly class Api
     {
         try {
             $requestContent = json_decode($request->rawContent());
+            $data = $requestContent->data;
+            $page = $requestContent->page;
 
-            $storedData = $this->config->outbounds->processStoreRequestContent($transactionStateObject,$requestContent->data);
+            $storedData = $this->config->outbounds->processStoreRequestContent($page, $transactionStateObject, $data);
 
             $changedTransactionStateObject = FluxEcoTransactionStateObject::createNew(
                 $transactionStateObject->transactionId,
                 $storedData,
-                $requestContent->page
+                $page
             );
 
             $transactionDataCache->set($changedTransactionStateObject->transactionId, [

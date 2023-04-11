@@ -76,6 +76,7 @@ final readonly class BaseDataItemAttributesDefinition
         public FluxEcoAttributeDefinition $vorname2,
         public FluxEcoAttributeDefinition $vorname3,
         public FluxEcoAttributeDefinition $wunscheinstufungssemester,
+        public FluxEcoAttributeDefinition $matrikelnummer
     )
     {
 
@@ -105,7 +106,7 @@ final readonly class BaseDataItemAttributesDefinition
             FluxEcoAttributeDefinition::new("GeneralNotes", "string"),
             FluxEcoAttributeDefinition::new("HeimatortUniqueId", "int"),
             FluxEcoAttributeDefinition::new("Identifikationsnummer", "string"),
-            FluxEcoAttributeDefinition::new("KorrespondenzspraccheUniqueId", "int"),
+            FluxEcoAttributeDefinition::new("KorrespondenzspracheUniqueId", "int"),
             FluxEcoAttributeDefinition::new("Land", "string"),
             FluxEcoAttributeDefinition::new("LandUniqueId", "int"),
             FluxEcoAttributeDefinition::new("LastCompletedController", "string"),
@@ -153,6 +154,7 @@ final readonly class BaseDataItemAttributesDefinition
             FluxEcoAttributeDefinition::new("Vorname2", "string"),
             FluxEcoAttributeDefinition::new("Vorname3", "string"),
             FluxEcoAttributeDefinition::new("WunschEinstufungsSemester", "string"),
+            FluxEcoAttributeDefinition::new("Matrikelnummer", "string")
         );
     }
 }

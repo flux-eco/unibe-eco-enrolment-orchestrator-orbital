@@ -8,7 +8,7 @@ final readonly class Workflow
 {
 
     /**
-     * @param FluxEcoWorkflowDefinitionNextPageName[] $nextPageNames
+     * @param FluxEcoWorkflowDefinitionNextPageAsPropertyName[] $nextPageNames
      */
     private function __construct(
         public string $startPageName,
@@ -20,7 +20,7 @@ final readonly class Workflow
 
 
     /**
-     * @param FluxEcoWorkflowDefinitionNextPageName[] $nextPageNames
+     * @param FluxEcoWorkflowDefinitionNextPageAsPropertyName[] $nextPageNames
      * An associative array with key as previous handled page name and value as the next page name.
      * Value can be either a string indicating the next page or a closure that takes a
      * FluxEcoTransactionStateObject parameter and returns the next page name as a string.
@@ -43,8 +43,8 @@ final readonly class Workflow
         }
 
         if (array_key_exists($lastHandledPage, $this->nextPageNames) === false) {
-            throw new Exception("no further page found - last completed action: " . $lastHandledPage);
+            throw new Exception("no further page found - last handled page: " . $lastHandledPage. " searched in: ".print_r($this->nextPageNames, true));
         }
-        return $this->nextPageNames[$lastHandledPage]->getNextPageName($transactionStateObject);
+        return $this->nextPageNames[$lastHandledPage]->getNextPageAsPropertyName($transactionStateObject);
     }
 }

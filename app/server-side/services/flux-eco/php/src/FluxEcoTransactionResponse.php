@@ -9,7 +9,7 @@ final readonly class FluxEcoTransactionResponse implements JsonSerializable
 
     private function __construct(
         public string  $transactionId,
-        public ?string $lastCompletedAction,
+        public ?string $context,
         public bool    $ok,
         public array   $errorMessages
     )
@@ -19,7 +19,7 @@ final readonly class FluxEcoTransactionResponse implements JsonSerializable
 
     public static function new(
         string  $transactionId,
-        ?string $lastCompletedAction,
+        ?string $context,
         bool    $ok,
         array   $errorMessages = []
     ): self
@@ -27,12 +27,18 @@ final readonly class FluxEcoTransactionResponse implements JsonSerializable
         return new self(...get_defined_vars());
     }
 
-    public function toJson(): string {
+    public function toJson(): string
+    {
         return json_encode($this);
     }
 
     public function jsonSerialize(): array
     {
-        return get_object_vars($this);
+        return [
+            "transaction-id" => $this->transactionId,
+            "context" => $this->context,
+            "ok" => $this->ok,
+            "error-messages" => $this->errorMessages,
+        ];
     }
 }

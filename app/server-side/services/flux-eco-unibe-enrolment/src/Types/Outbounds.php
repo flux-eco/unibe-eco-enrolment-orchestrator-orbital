@@ -2,7 +2,7 @@
 
 namespace FluxEco\UnibeEnrolment\Types;
 
-use FluxEco\UnibeEnrolment\Types\Enrolment\OutputDataObject;
+use FluxEco\UnibeEnrolment\Types\Enrolment\WorkflowOutputDefinition;
 
 use FluxEcoType\FluxEcoAttributeDefinition;
 use FluxEcoType\FluxEcoTransactionStateObject;
@@ -29,13 +29,13 @@ final readonly class Outbounds implements OutboundsActionsProcessor
         return $this->actionProcessor->processReadJsonFile($directoryPath, $jsonFileName);
     }
 
-    public function processCreateEnrolment(FluxEcoTransactionStateObject $transactionStateObject, object $dataToProcess): object
+    public function processCreateEnrolment(string $currentPage, FluxEcoTransactionStateObject $transactionStateObject, object $dataToProcess): object
     {
-        return $this->actionProcessor->processCreateEnrolment($transactionStateObject, $dataToProcess);
+        return $this->actionProcessor->processCreateEnrolment($currentPage, $transactionStateObject, $dataToProcess);
     }
 
-    public function processUpdateEnrolment(FluxEcoTransactionStateObject $transactionStateObject, object $dataToProcess, OutputDataObject $dataToProcessAttributesDefinition): object
+    public function processUpdateEnrolment(string $currentPage, FluxEcoTransactionStateObject $transactionStateObject, object $dataToProcess, WorkflowOutputDefinition $dataToProcessAttributesDefinition): object
     {
-        return $this->actionProcessor->processUpdateEnrolment($transactionStateObject, $dataToProcess, $dataToProcessAttributesDefinition);
+        return $this->actionProcessor->processUpdateEnrolment($currentPage, $transactionStateObject, $dataToProcess, $dataToProcessAttributesDefinition);
     }
 }
