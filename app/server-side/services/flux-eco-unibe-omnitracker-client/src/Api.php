@@ -2,10 +2,12 @@
 
 namespace FluxEco\UnibeOmnitrackerClient;
 
+use Exception;
 use FluxEco\UnibeOmnitrackerClient\Types;
 use FluxEco\UnibeOmnitrackerClient\Types\Exceptions\FluxEcoUnibeOmnitrackerClientFluxEcoInvalidInputException;
 use FluxEco\UnibeOmnitrackerClient\Types\UnibeOmnitrackerSoapApi\BaseDataItemAttributesDefinition;
 use FluxEcoType\FluxEcoActionDefinition;
+use FluxEcoType\FluxEcoExceptionDefinitions\FluxEcoException;
 use FluxEcoType\FluxEcoExceptionDefinitions\FluxEcoInvalidInputException;
 use stdClass;
 
@@ -68,6 +70,60 @@ final readonly class Api
         return $this->processOmnitrackerApiRequest($actionDefinition, $parametersObject, $transactionId);
     }
 
+    /**
+     * @throws FluxEcoInvalidInputException
+     * @throws FluxEcoException
+     */
+    public function readPreviousEnrolment(string $transactionId, int $identicationNumber, string $password): object|null
+    {
+        return $this->login($transactionId, $identicationNumber, $password);
+    }
+
+    /**
+     * @throws FluxEcoInvalidInputException
+     */
+
+    private function getObjectBasisDaten(string $transactionId, int $identicationNumber): object
+    {
+        $actionDefinition = $this->config->settings->unibeOmnitrackerSoapApiActionsDefinitions->GetObjectBasisdaten;
+        /** @var Types\UnibeOmnitrackerSoapApi\GetObjectBasisdatenParametersDefinition $parametersDefinition */
+        $parametersDefinition = $actionDefinition->parametersDefinition;
+
+        $parameters = new stdClass();
+        $parameters->{$parametersDefinition->pSessionId->name} = $transactionId;
+        $parameters->{$parametersDefinition->pIdentification->name} = $identicationNumber;
+        $parameters = $this->hydrateObject($parameters, $parametersDefinition->defaultParametersDefinition);
+
+        return $this->processOmnitrackerApiRequest($actionDefinition, $parameters, $transactionId);
+    }
+
+    /**
+     * @throws FluxEcoException
+     */
+    private function login(string $transactionId, int $identicationNumber, string $password): object
+    {
+        $actionDefinition = $this->config->settings->unibeOmnitrackerSoapApiActionsDefinitions->Login;
+        /** @var Types\UnibeOmnitrackerSoapApi\LoginParametersDefinition $parametersDefinition */
+        $parametersDefinition = $actionDefinition->parametersDefinition;
+
+        $parameters = new stdClass();
+        $parameters->{$parametersDefinition->pSessionId->name} = $transactionId;
+        $parameters->{$parametersDefinition->pIdentification->name} = $identicationNumber;
+        $parameters->{$parametersDefinition->pUserPassword->name} = $password;
+        $parameters = $this->hydrateObject($parameters, $parametersDefinition->defaultParametersDefinition);
+
+        //login and set the new transactionId/pSessionId
+        try {
+           return $this->processOmnitrackerApiRequest($actionDefinition, $parameters);
+        } catch (Exception $e) {
+            throw FluxEcoUnibeOmnitrackerClientFluxEcoInvalidInputException::createForClientSideContext(
+                "Wrong login or Password",
+                $transactionId,
+                $actionDefinition->name
+            );
+        }
+    }
+
     private function createAbsoluteActionPath(FluxEcoActionDefinition $actionDefinition): string
     {
         return $this->config->createAbsoluteActionPath($this->config->settings->unibeOmnitrackerSoapApiBindingDefinition->toString(), $actionDefinition->path);
@@ -116,6 +172,7 @@ final readonly class Api
     {
         return json_decode(json_encode($this->readIdLabelDataList($this->config->settings->unibeOmnitrackerSoapApiActionsDefinitions->GetListKorrespondenzsprache->name)));
     }
+
 
     /**
      * @return object[]
@@ -375,7 +432,65 @@ final readonly class Api
     /**
      * @return object[]
      */
-    public function readMunicipalities(): array
+    public function readNationalities(): array
+    {
+        $actionDefinition = $this->config->settings->unibeOmnitrackerSoapApiActionsDefinitions->GetListStaat;
+        /** @var Types\UnibeOmnitrackerSoapApi\GetListStudiengangsversionParametersDefinition $parametersDefinition */
+        $parametersDefinition = $actionDefinition->parametersDefinition;
+        $parameters = new stdClass();
+        $parameters = $this->hydrateObject($parameters, $this->config->settings->defaultActionParameterDefinitions);
+        $results = $this->processOmnitrackerApiRequest($actionDefinition, $parameters);
+        $dataList = [];
+        foreach ($results as $item) {
+            /*$dataList[$item->UniqueId] = json_decode(json_encode(Types\ResponseData\Locality::new(
+                $item->UniqueId,
+                Types\ResponseData\Label::newGermanLabel($item->Title),
+                $item->Plz,
+                $item->KantonUniqueId
+            )));*/
+
+            $dataList[] = json_decode(json_encode(Types\ResponseData\Country::new(
+                $item->UniqueId,
+                Types\ResponseData\Label::newGermanLabel($item->Title),
+                $item->Code
+            )));
+        }
+        return $dataList;
+    }
+
+    /**
+     * @return object[]
+     */
+    public function readCountries(): array
+    {
+        $actionDefinition = $this->config->settings->unibeOmnitrackerSoapApiActionsDefinitions->GetListLand;
+        /** @var Types\UnibeOmnitrackerSoapApi\GetListStudiengangsversionParametersDefinition $parametersDefinition */
+        $parametersDefinition = $actionDefinition->parametersDefinition;
+        $parameters = new stdClass();
+        $parameters = $this->hydrateObject($parameters, $this->config->settings->defaultActionParameterDefinitions);
+        $results = $this->processOmnitrackerApiRequest($actionDefinition, $parameters);
+        $dataList = [];
+        foreach ($results as $item) {
+            /*$dataList[$item->UniqueId] = json_decode(json_encode(Types\ResponseData\Locality::new(
+                $item->UniqueId,
+                Types\ResponseData\Label::newGermanLabel($item->Title),
+                $item->Plz,
+                $item->KantonUniqueId
+            )));*/
+
+            $dataList[] = json_decode(json_encode(Types\ResponseData\Country::new(
+                $item->UniqueId,
+                Types\ResponseData\Label::newGermanLabel($item->Title),
+                $item->Code
+            )));
+        }
+        return $dataList;
+    }
+
+    /**
+     * @return object[]
+     */
+    public function readOriginPlaces(): array
     {
         $actionDefinition = $this->config->settings->unibeOmnitrackerSoapApiActionsDefinitions->GetListGemeinde;
         /** @var Types\UnibeOmnitrackerSoapApi\GetListStudiengangsversionParametersDefinition $parametersDefinition */
@@ -386,7 +501,14 @@ final readonly class Api
 
         $dataList = [];
         foreach ($results as $item) {
-            $dataList[$item->UniqueId] = json_decode(json_encode(Types\ResponseData\Locality::new(
+            /*$dataList[$item->UniqueId] = json_decode(json_encode(Types\ResponseData\Locality::new(
+                $item->UniqueId,
+                Types\ResponseData\Label::newGermanLabel($item->Title),
+                $item->Plz,
+                $item->KantonUniqueId
+            )));*/
+
+            $dataList[] = json_decode(json_encode(Types\ResponseData\Locality::new(
                 $item->UniqueId,
                 Types\ResponseData\Label::newGermanLabel($item->Title),
                 $item->Plz,
@@ -495,24 +617,6 @@ final readonly class Api
         return $dataList;
     }
 
-    /**
-     * @return object[]
-     */
-    public function readCountries(): array
-    {
-        $requestAction = $this->config->settings->unibeOmnitrackerSoapApiRequestActions->getListStaat();
-        $results = $this->processOmnitrackerApiRequest($requestAction);
-
-        $dataList = [];
-        foreach ($results as $item) {
-            $dataList[$item->UniqueId] = json_decode(json_encode(Types\ResponseData\Country::new(
-                $item->UniqueId,
-                Types\ResponseData\Label::newGermanLabel($item->Title),
-                $item->Code
-            )));
-        }
-        return $dataList;
-    }
 
     /**
      * @throws FluxEcoInvalidInputException
@@ -540,6 +644,8 @@ final readonly class Api
         }
 
         if (property_exists($response, "pFehler",) && empty($response->{"pFehler"}) !== true) {
+            echo $response->{"pFehler"};
+
             throw FluxEcoUnibeOmnitrackerClientFluxEcoInvalidInputException::createForClientSideContext(
                 $response->{"pFehler"},
                 $transactionId,
@@ -548,6 +654,7 @@ final readonly class Api
         }
 
         $response = $response->{$actionResponseDefinition->data->name};
+
         if (is_string($response)) {
             return json_decode($response);
         }

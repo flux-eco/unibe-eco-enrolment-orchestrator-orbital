@@ -1,0 +1,10 @@
+{
+  "page": "identification-number",
+  "data": {
+    "identification-number": {
+      "$state": "data.Identifikationsnummer"
+    }
+  },
+  "can-back": false,
+  "can-logout": true
+}

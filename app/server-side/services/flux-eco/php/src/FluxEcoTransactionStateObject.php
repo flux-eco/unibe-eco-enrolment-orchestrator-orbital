@@ -2,12 +2,13 @@
 
 namespace FluxEcoType;
 
-final readonly class FluxEcoTransactionStateObject
+final readonly class  FluxEcoTransactionStateObject
 {
     private function __construct(
         public string  $transactionId,
         public ?object $data,
-        public ?string $lastHandledPage,
+        public array  $handledPageNamesCurrentWorkflow,
+        public ?string $currentPageName,
         public ?int    $expiration
     )
     {
@@ -17,19 +18,21 @@ final readonly class FluxEcoTransactionStateObject
     public static function createNew(
         string  $transactionId,
         ?object $data = null,
-        ?string $lastHandledPage = null,
+        array  $handledPageNamesCurrentWorkflow = [],
+        ?string $currentPageName = null,
 
     ): self
     {
         return new self(
-            $transactionId, $data, $lastHandledPage, time() + 3600 // Expiration: 1 hour after the last storage operation
+            $transactionId, $data, $handledPageNamesCurrentWorkflow, $currentPageName, time() + 3600 // Expiration: 1 hour after the last storage operation
         );
     }
 
     public static function fromCachedState(
         string  $transactionId,
         ?object $data = null,
-        ?string $lastHandledPage = null,
+        array  $handledPageNamesCurrentWorkflow = [],
+        ?string $currentPageName = null,
         int     $expiration = null
     ): self
     {

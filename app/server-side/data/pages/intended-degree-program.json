@@ -1,0 +1,10 @@
+{
+  "page": "intended-degree-program",
+  "data": {
+    "subjects": {
+      "$dynamic": "readSubjectData"
+    }
+  },
+  "can-back": true,
+  "can-logout": true
+}

@@ -29,13 +29,18 @@ final readonly class Outbounds implements OutboundsActionsProcessor
         return $this->actionProcessor->processReadJsonFile($directoryPath, $jsonFileName);
     }
 
-    public function processCreateEnrolment(string $currentPage, FluxEcoTransactionStateObject $transactionStateObject, object $dataToProcess): object
+    public function processReadResumeEnrolmentData(string $transactionId, string $identificationNumber, string $password): object
     {
-        return $this->actionProcessor->processCreateEnrolment($currentPage, $transactionStateObject, $dataToProcess);
+        return $this->actionProcessor->processReadResumeEnrolmentData($transactionId, $identificationNumber, $password);
     }
 
-    public function processUpdateEnrolment(string $currentPage, FluxEcoTransactionStateObject $transactionStateObject, object $dataToProcess, WorkflowOutputDefinition $dataToProcessAttributesDefinition): object
+    public function processCreateEnrolment(FluxEcoTransactionStateObject $transactionStateObject, string $password): object
     {
-        return $this->actionProcessor->processUpdateEnrolment($currentPage, $transactionStateObject, $dataToProcess, $dataToProcessAttributesDefinition);
+        return $this->actionProcessor->processCreateEnrolment($transactionStateObject, $password);
+    }
+
+    public function processUpdateEnrolment(FluxEcoTransactionStateObject $transactionStateObject, object $dataToProcess, WorkflowOutputDefinition $dataToProcessAttributesDefinition): object
+    {
+        return $this->actionProcessor->processUpdateEnrolment($transactionStateObject, $dataToProcess, $dataToProcessAttributesDefinition);
     }
 }

@@ -3,6 +3,8 @@
 !LICENSE
 !README.md
 !app/
+app/server-side/data/input-options/*
+app/server-side/services/libphonenumber/*
 !docker/
 configs/*
 !configs/

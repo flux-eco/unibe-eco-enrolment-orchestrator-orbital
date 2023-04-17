@@ -1,0 +1,11 @@
+{
+  "page": "create",
+  "data": {
+    "semesters": {
+      "$ref": "../input-options/semesters.json"
+    },
+    "min-password-length": 8
+  },
+  "can-back": false,
+  "can-logout": false
+}

@@ -1,0 +1,14 @@
+{
+  "page": "intended-degree-program-2",
+  "data": {
+    "subject": {
+      "$dynamic": "readChoosenSubjectData"
+    },
+    "combination": {
+      "$dynamic": "readSubjectCombinationData"
+    },
+    "values": null
+  },
+  "can-back": true,
+  "can-logout": true
+}

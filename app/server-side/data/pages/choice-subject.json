@@ -1,0 +1,10 @@
+{
+  "page": "choice-subject",
+  "data": {
+    "degree-programs": {
+      "$ref": "../input-options/degree-programs.json"
+    }
+  },
+  "can-back": false,
+  "can-logout": true
+}

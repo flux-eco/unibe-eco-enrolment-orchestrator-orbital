@@ -1,0 +1,225 @@
+{
+  "menu": {
+    "ids": [
+      "application-login"
+    ],
+    "id": "application-login"
+  },
+  "page": "personal-data",
+  "data": {
+    "salutations": [
+      {
+        "id": "salutation_1",
+        "label": {
+          "en": "Salutation 1",
+          "de": "Anrede 1"
+        }
+      },
+      {
+        "id": "salutation_2",
+        "label": {
+          "en": "Salutation 2",
+          "de": "Anrede 2"
+        }
+      },
+      {
+        "id": "salutation_3",
+        "label": {
+          "en": "Salutation 3",
+          "de": "Anrede 3"
+        }
+      }
+    ],
+    "registration-number-format": "/^\\d{2}-\\d{3}-\\d{3}$/",
+    "registration-number-example": "00-000-000",
+    "countries": [
+      {
+        "id": "country_1",
+        "label": {
+          "en": "Country 1",
+          "de": "Land 1"
+        }
+      },
+      {
+        "id": "country_2",
+        "label": {
+          "en": "Country 2",
+          "de": "Land 2"
+        }
+      },
+      {
+        "id": "country_3",
+        "label": {
+          "en": "Country 3",
+          "de": "Land 3"
+        }
+      }
+    ],
+    "extra-address-line-example": "c/o",
+    "min-house-number": 1,
+    "max-house-number": 9999,
+    "min-postal-code": 1,
+    "max-postal-code": 9999,
+    "places": [
+      {
+        "id": "place_1",
+        "postal-code": 1001,
+        "label": {
+          "en": "Place 1",
+          "de": "Ort 1"
+        }
+      },
+      {
+        "id": "place_2",
+        "postal-code": 1002,
+        "label": {
+          "en": "Place 2",
+          "de": "Ort 2"
+        }
+      },
+      {
+        "id": "place_3",
+        "postal-code": 1003,
+        "label": {
+          "en": "Place 3",
+          "de": "Ort 3"
+        }
+      }
+    ],
+    "area-codes": [
+      {
+        "id": "area_code_1",
+        "label": {
+          "en": "Area code 1",
+          "de": "Vorwahl 1"
+        },
+        "phone-number-format": "/^\\d{3} \\d{3} \\d{2} \\d{2}$/",
+        "phone-number-example": "000 000 00 00"
+      },
+      {
+        "id": "area_code_2",
+        "label": {
+          "en": "Area code 2",
+          "de": "Vorwahl 2"
+        },
+        "phone-number-format": "/^\\d{3} \\d{3} \\d{2} \\d{2}$/",
+        "phone-number-example": "000 000 00 00"
+      },
+      {
+        "id": "area_code_3",
+        "label": {
+          "en": "Area code 3",
+          "de": "Vorwahl 3"
+        },
+        "phone-number-format": "/^\\d{3} \\d{3} \\d{2} \\d{2}$/",
+        "phone-number-example": "000 000 00 00"
+      }
+    ],
+    "required-phone": false,
+    "only-one-phone": false,
+    "required-phone-home": false,
+    "required-phone-mobile": false,
+    "required-phone-business": false,
+    "required-email": false,
+    "mother-languages": [
+      {
+        "id": "mother_language_1",
+        "label": {
+          "en": "Mother language 1",
+          "de": "Muttersprache 1"
+        }
+      },
+      {
+        "id": "mother_language_2",
+        "label": {
+          "en": "Mother language 2",
+          "de": "Muttersprache 2"
+        }
+      },
+      {
+        "id": "mother_language_3",
+        "label": {
+          "en": "Mother language 3",
+          "de": "Muttersprache 3"
+        }
+      }
+    ],
+    "correspondence-languages": [
+      {
+        "id": "correspondence_language_1",
+        "label": {
+          "en": "Correspondence language 1",
+          "de": "Korrespondenzsprache 1"
+        }
+      },
+      {
+        "id": "correspondence_language_2",
+        "label": {
+          "en": "Correspondence language 2",
+          "de": "Korrespondenzsprache 2"
+        }
+      },
+      {
+        "id": "correspondence_language_3",
+        "label": {
+          "en": "Correspondence language 3",
+          "de": "Korrespondenzsprache 3"
+        }
+      }
+    ],
+    "min-birth-date": "1958-04-16",
+    "max-birth-date": "2008-04-16",
+    "old-age-survivar-insurance-number-format": "/^\\d{3}\\.\\d{4}\\.\\d{4}\\.\\d{2}$/",
+    "old-age-survivar-insurance-number-example": "000.0000.0000.00",
+    "nationalities": [
+      {
+        "id": "nationally_1",
+        "label": {
+          "en": "Nationally 1",
+          "de": "Nationalität 1"
+        }
+      },
+      {
+        "id": "nationally_2",
+        "label": {
+          "en": "Nationally 2",
+          "de": "Nationalität 2"
+        }
+      },
+      {
+        "id": "nationally_3",
+        "label": {
+          "en": "Nationally 3",
+          "de": "Nationalität 3"
+        }
+      }
+    ],
+    "origin-places": [
+      {
+        "id": "origin_place_1",
+        "label": {
+          "en": "Origin place 1",
+          "de": "Heimatort 1"
+        }
+      },
+      {
+        "id": "origin_place_2",
+        "label": {
+          "en": "Origin place 2",
+          "de": "Heimatort 2"
+        }
+      },
+      {
+        "id": "origin_place_3",
+        "label": {
+          "en": "Origin place 3",
+          "de": "Heimatort 3"
+        }
+      }
+    ],
+    "values": null
+  },
+  "user-name": "3r3bfvuk63",
+  "can-back": true,
+  "can-logout": true
+}

@@ -3,27 +3,35 @@
 namespace FluxEco\UnibeEnrolment\Types\Enrolment;
 
 
-
 use FluxEcoType\FluxEcoFilePathDefinition;
 use FluxEcoType\FluxEcoDefinitionItem;
 
-final readonly class Pages
+final class Pages
 {
+    private array $pages;
+
     private function __construct(
-        public FluxEcoDefinitionItem $start,
-        public FluxEcoDefinitionItem $create,
-        public FluxEcoDefinitionItem $identificationNumber,
-        public FluxEcoDefinitionItem $choiceSubject,
-        public FluxEcoDefinitionItem $intendedDegreeProgram,
-        public FluxEcoDefinitionItem $intendedDegreeProgram2,
-        public FluxEcoDefinitionItem $universityEntranceQualification,
-        public FluxEcoDefinitionItem $portrait,
-        public FluxEcoDefinitionItem $personalData,
-        public FluxEcoDefinitionItem $legal,
-        public FluxEcoDefinitionItem $completed
+        public readonly FluxEcoDefinitionItem $create,
+        public readonly FluxEcoDefinitionItem $identificationNumber,
+        public readonly FluxEcoDefinitionItem $choiceSubject,
+        public readonly FluxEcoDefinitionItem $intendedDegreeProgram,
+        public readonly FluxEcoDefinitionItem $intendedDegreeProgram2,
+        public readonly FluxEcoDefinitionItem $universityEntranceQualification,
+        public readonly FluxEcoDefinitionItem $portrait,
+        public readonly FluxEcoDefinitionItem $personalData,
+        public readonly FluxEcoDefinitionItem $legal,
+        public readonly FluxEcoDefinitionItem $completed,
+        public readonly FluxEcoDefinitionItem $resume
     )
     {
+        foreach (get_object_vars($this) as /** @var FluxEcoDefinitionItem $page */ $page) {
+            $this->pages[$page->name] = $page;
+        }
+    }
 
+    public function getPageByName(string $pageName)
+    {
+        return $this->pages[$pageName];
     }
 
     public static function new(
@@ -32,7 +40,6 @@ final readonly class Pages
     {
         //todo either we write page names like defined here to the json file or we read the name from the json file. we should not have two places where the name is initial defined.
         return new self(
-            FluxEcoDefinitionItem::new("start", FluxEcoFilePathDefinition::new($pageItemsDirectory, "start.json")),
             FluxEcoDefinitionItem::new("create", FluxEcoFilePathDefinition::new($pageItemsDirectory, "create.json")),
             FluxEcoDefinitionItem::new("identification-number", FluxEcoFilePathDefinition::new($pageItemsDirectory, "identification-number.json")),
             FluxEcoDefinitionItem::new("choice-subject", FluxEcoFilePathDefinition::new($pageItemsDirectory, "choice-subject.json")),
@@ -43,6 +50,7 @@ final readonly class Pages
             FluxEcoDefinitionItem::new("personal-data", FluxEcoFilePathDefinition::new($pageItemsDirectory, "personal-data.json")),
             FluxEcoDefinitionItem::new("legal", FluxEcoFilePathDefinition::new($pageItemsDirectory, "legal.json")),
             FluxEcoDefinitionItem::new("completed", FluxEcoFilePathDefinition::new($pageItemsDirectory, "completed.json")),
+            FluxEcoDefinitionItem::new("resume", FluxEcoFilePathDefinition::new($pageItemsDirectory, "resume.json")),
         );
     }
 }

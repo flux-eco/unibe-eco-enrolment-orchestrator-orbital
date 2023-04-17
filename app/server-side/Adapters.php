@@ -8,6 +8,8 @@ use FluxEco\UnibeOmnitrackerClient;
 use FluxEco\UnibeOmnitrackerClient\Types\UnibeOmnitrackerSoapApi\BaseDataItemAttributesDefinition;
 use FluxEcoType\FluxEcoTransactionStateObject;
 use FluxEco\ObjectMapper;
+use libphonenumber\PhoneNumberFormat;
+use libphonenumber\PhoneNumberUtil;
 
 final readonly class Adapters
 {
@@ -38,9 +40,22 @@ final readonly class Adapters
                 return FluxEcoType\FluxEcoId::newHashedUuid4()->id;
             }
 
+            public function processReadNextPageName(string $lastHandledPageName, FluxEcoTransactionStateObject $transactionStateObject): string
+            {
+                $workflow = $this->unibeEnrolmentApi->readEnrolmentDefinition()->workflow;
+                return $workflow->getNextPageName($lastHandledPageName, $transactionStateObject);
+            }
+
+
             public function processReadCurrentPage(FluxEcoTransactionStateObject $transactionStateObject): string
             {
                 return $this->unibeEnrolmentApi->readPage($transactionStateObject);
+            }
+
+            public function processReadPreviousPageName(FluxEcoTransactionStateObject $transactionStateObject): string
+            {
+                $handledPageNames = $transactionStateObject->handledPageNamesCurrentWorkflow;
+                return end($handledPageNames);
             }
 
             public function processReadLayout(): string
@@ -48,9 +63,43 @@ final readonly class Adapters
                 return $this->unibeEnrolmentApi->readLayout();
             }
 
-            public function processStoreRequestContent(string $currentPage, FluxEcoType\FluxEcoTransactionStateObject $transactionStateObject, object $dataToProcess): object
+            public function processStoreRequestContent(FluxEcoType\FluxEcoTransactionStateObject $transactionStateObject, object $processData): object
             {
-                return $this->unibeEnrolmentApi->storeData($currentPage, $transactionStateObject, $dataToProcess);
+                return $this->unibeEnrolmentApi->storeData($transactionStateObject, $processData);
+            }
+
+            public function processReadStartPageName(): string
+            {
+                return $this->unibeEnrolmentApi->readEnrolmentDefinition()->workflow->startPageName;
+            }
+
+            public function isLastPage(FluxEcoTransactionStateObject $transactionStateObject): bool
+            {
+                $workflow = $this->unibeEnrolmentApi->readEnrolmentDefinition()->workflow;
+                return ($transactionStateObject->currentPageName === $workflow->lastPageName);
+            }
+
+            public function isResumePage(string $pageName): bool
+            {
+                $workflow = $this->unibeEnrolmentApi->readEnrolmentDefinition()->workflow;
+                return ($pageName === $workflow->resumePageName);
+            }
+
+            public function isStartPage(string $pageName): bool
+            {
+                $workflow = $this->unibeEnrolmentApi->readEnrolmentDefinition()->workflow;
+                return ($pageName === $workflow->startPageName);
+            }
+
+            public function processReadResumeEnrolmentData(string $transactionId, object $processData): object
+            {
+                return $this->unibeEnrolmentApi->readPreviousEnrolment($transactionId, $processData);
+            }
+
+            public function processReadLastHandledPageNameFromWorkflowState(object $workflowState): string
+            {
+                $workflow = $this->unibeEnrolmentApi->readEnrolmentDefinition()->workflow;
+                return $workflowState->{$workflow->workflowStateLastHandledPageAttributeName};
             }
         };
     }
@@ -74,17 +123,20 @@ final readonly class Adapters
                 return $this->jsonFileProcessor->readJsonFile($directoryPath, $jsonFileName);
             }
 
-            public function processCreateEnrolment(string $currentPage, FluxEcoTransactionStateObject $transactionStateObject, object $dataToProcess): object
+            public function processCreateEnrolment(FluxEcoTransactionStateObject $transactionStateObject, string $password): object
             {
-                $itemAttributesDefinitionToMapTo = $this->unibeOmnitrackerClient->readBaseDataItemAttributesDefinition();
-                $dataToProcess->{$itemAttributesDefinitionToMapTo->lastcompletedcontroller->name} = $currentPage;
-                //todo encrypt password
-                return $this->unibeOmnitrackerClient->createEnrolment($transactionStateObject->transactionId, $dataToProcess->password);
+                return $this->unibeOmnitrackerClient->createEnrolment($transactionStateObject->transactionId, $password);
             }
 
-            public function processUpdateEnrolment(string $currentPage, FluxEcoTransactionStateObject $transactionStateObject, object $dataToProcess, WorkflowOutputDefinition $dataToProcessAttributesDefinition): object
+            public function processReadResumeEnrolmentData(string $transactionId, string $identificationNumber, string $password): object
             {
-                $this->validate($currentPage, $dataToProcess);
+                return $this->unibeOmnitrackerClient->readPreviousEnrolment($transactionId, $identificationNumber, $password);
+
+            }
+
+            public function processUpdateEnrolment(FluxEcoTransactionStateObject $transactionStateObject, object $dataToProcess, WorkflowOutputDefinition $dataToProcessAttributesDefinition): object
+            {
+                $this->validate($transactionStateObject->currentPageName, $dataToProcess);
 
                 $itemAttributesDefinitionToMapTo = $this->unibeOmnitrackerClient->readBaseDataItemAttributesDefinition();
                 $srcKeyToNewKeyMapping = [
@@ -150,7 +202,7 @@ final readonly class Adapters
                         return $objectToMapTo;
                     },
                     $dataToProcessAttributesDefinition->degreeProgram->name => $itemAttributesDefinitionToMapTo->studienstufeuniqueid,
-                   // $dataToProcessAttributesDefinition->studiengangsversionparalleluniqueid->name => $itemAttributesDefinitionToMapTo->studiengangsversionparalleluniqueid->name,
+                    // $dataToProcessAttributesDefinition->studiengangsversionparalleluniqueid->name => $itemAttributesDefinitionToMapTo->studiengangsversionparalleluniqueid->name,
                     $dataToProcessAttributesDefinition->subject->name => $itemAttributesDefinitionToMapTo->studiengangsversionuniqueid,
                     //$dataToProcessAttributesDefinition->studienstrukturparalleluniqueid->name => $itemAttributesDefinitionToMapTo->studienstrukturparalleluniqueid->name,
                     $dataToProcessAttributesDefinition->combination->name => $itemAttributesDefinitionToMapTo->studienstrukturuniqueid,
@@ -175,11 +227,6 @@ final readonly class Adapters
                     $dataToProcessAttributesDefinition->registrationNumber->name => $itemAttributesDefinitionToMapTo->wunscheinstufungssemester,
                 ];
 
-
-                $dataToProcess->{$itemAttributesDefinitionToMapTo->lastcompletedcontroller->name} = $currentPage;
-                //todo if completed
-                //$dataToProcessAttributesDefinition->registrationcompleted->name => $itemAttributesDefinitionToMapTo->registrationcompleted->name,
-
                 $baseDataItem = ObjectMapper\Api::new()->createMappedObject(
                     $dataToProcess,
                     $srcKeyToNewKeyMapping,
@@ -189,6 +236,9 @@ final readonly class Adapters
                     )
                 );
 
+                $baseDataItem->{$itemAttributesDefinitionToMapTo->lastcompletedcontroller->name} = $transactionStateObject->currentPageName;
+                //todo if completed
+                //$dataToProcessAttributesDefinition->registrationcompleted->name => $itemAttributesDefinitionToMapTo->registrationcompleted->name,
 
                 return $this->unibeOmnitrackerClient->updateEnrolment($transactionStateObject->transactionId, $baseDataItem);
             }
@@ -208,7 +258,7 @@ final readonly class Adapters
             public function mapArrayToString(object $srcObject, object $objectToMapTo, string $mapFromKey, string $mapToKey): object
             {
                 if (property_exists($srcObject, $mapFromKey)) {
-                    $objectToMapTo->{$mapToKey} =  (is_string($srcObject->{$mapFromKey}) || is_null($srcObject->{$mapFromKey})) ? $srcObject->{$mapFromKey} : implode(", ", $srcObject->{$mapFromKey});
+                    $objectToMapTo->{$mapToKey} = (is_string($srcObject->{$mapFromKey}) || is_null($srcObject->{$mapFromKey})) ? $srcObject->{$mapFromKey} : implode(", ", $srcObject->{$mapFromKey});
                     return $objectToMapTo;
                 }
                 return $objectToMapTo;
@@ -244,47 +294,54 @@ final readonly class Adapters
              */
             public function mapPhoneNumber(object $srcObject, object $objectToMapTo, WorkflowOutputDefinition $dataToProcessAttributesDefinition, BaseDataItemAttributesDefinition $itemAttributesDefinitionToMapTo): object
             {
-                    $fromBusinessKey = $dataToProcessAttributesDefinition->businessPhoneNumber->name;
-                    $fromBusinessAreaKey = $dataToProcessAttributesDefinition->businessPhoneAreaCode->name;
 
-                    $fromHomeKey = $dataToProcessAttributesDefinition->homePhoneNumber->name;
-                    $fromHomeAreaKey = $dataToProcessAttributesDefinition->homePhoneAreaCode->name;
-
-                    $fromMobileKey = $dataToProcessAttributesDefinition->mobilePhoneNumber->name;
-                    $fromMobileAreaKey = $dataToProcessAttributesDefinition->mobilePhoneAreaCode->name;
-
-
-                    $toPhoneTypeValueBusiness = "business";
-                    $toPhoneTypeValueHome = "home";
-                    $toPhoneTypeValueMobile = "mobile";
-
-                    $toPhoneType = $itemAttributesDefinitionToMapTo->telefontyp->name;
-                    $toAreaKey = $itemAttributesDefinitionToMapTo->countrycode->name;
-                    $toNumberKey = $itemAttributesDefinitionToMapTo->telefon->name;
+                $extractAndFormatNumber = function ($number, $countryCode) {
+                    $phoneNumberUtil = PhoneNumberUtil::getInstance(PhoneNumberUtil::META_DATA_FILE_PREFIX);
+                    $regionCode = $phoneNumberUtil->getRegionCodeForCountryCode($countryCode);
+                    $number = $phoneNumberUtil->parse($number, $regionCode);
+                    return $phoneNumberUtil->format($number, PhoneNumberFormat::INTERNATIONAL);
+                };
 
 
-                    if (property_exists($srcObject, $fromBusinessKey) && empty($srcObject->{$fromBusinessKey}) === false) {
-                        $objectToMapTo->{$toPhoneType} = $toPhoneTypeValueBusiness;
-                        $objectToMapTo->{$toNumberKey} = $srcObject->{$fromBusinessKey};
-                        $objectToMapTo->{$toAreaKey} = $srcObject->{$fromBusinessAreaKey};
-                    }
+                $fromBusinessKey = $dataToProcessAttributesDefinition->businessPhoneNumber->name;
+                $fromBusinessAreaKey = $dataToProcessAttributesDefinition->businessPhoneAreaCode->name;
 
-                    if (property_exists($srcObject, $fromHomeKey) && empty($srcObject->{$fromHomeKey}) === false) {
-                        $objectToMapTo->{$toPhoneType} = $toPhoneTypeValueHome;
-                        $objectToMapTo->{$toNumberKey} = $srcObject->{$fromHomeKey};
-                        $objectToMapTo->{$toAreaKey} = $srcObject->{$fromHomeAreaKey};
-                    }
+                $fromHomeKey = $dataToProcessAttributesDefinition->homePhoneNumber->name;
+                $fromHomeAreaKey = $dataToProcessAttributesDefinition->homePhoneAreaCode->name;
 
-                    if (property_exists($srcObject, $fromMobileKey) && empty($srcObject->{$fromMobileKey}) === false) {
-                        $objectToMapTo->{$toPhoneType} = $toPhoneTypeValueMobile;
-                        $objectToMapTo->{$toNumberKey} = $srcObject->{$fromMobileKey};
-                        $objectToMapTo->{$toAreaKey} = $srcObject->{$fromMobileAreaKey};
-                    }
+                $fromMobileKey = $dataToProcessAttributesDefinition->mobilePhoneNumber->name;
+                $fromMobileAreaKey = $dataToProcessAttributesDefinition->mobilePhoneAreaCode->name;
 
-                    return $objectToMapTo;
+
+                $toPhoneTypeValueBusiness = "business";
+                $toPhoneTypeValueHome = "home";
+                $toPhoneTypeValueMobile = "mobile";
+
+                $toPhoneType = $itemAttributesDefinitionToMapTo->telefontyp->name;
+                $toAreaKey = $itemAttributesDefinitionToMapTo->countrycode->name;
+                $toNumberKey = $itemAttributesDefinitionToMapTo->telefon->name;
+
+
+                if (property_exists($srcObject, $fromBusinessKey) && empty($srcObject->{$fromBusinessKey}) === false) {
+                    $objectToMapTo->{$toPhoneType} = $toPhoneTypeValueBusiness;
+                    $objectToMapTo->{$toNumberKey} = $extractAndFormatNumber($srcObject->{$fromBusinessKey}, $srcObject->{$fromBusinessAreaKey});
+                    $objectToMapTo->{$toAreaKey} = $srcObject->{$fromBusinessAreaKey};
                 }
 
+                if (property_exists($srcObject, $fromHomeKey) && empty($srcObject->{$fromHomeKey}) === false) {
+                    $objectToMapTo->{$toPhoneType} = $toPhoneTypeValueHome;
+                    $objectToMapTo->{$toNumberKey} = $extractAndFormatNumber($srcObject->{$fromHomeKey}, $srcObject->{$fromHomeAreaKey});
+                    $objectToMapTo->{$toAreaKey} = $srcObject->{$fromHomeAreaKey};
+                }
 
+                if (property_exists($srcObject, $fromMobileKey) && empty($srcObject->{$fromMobileKey}) === false) {
+                    $objectToMapTo->{$toPhoneType} = $toPhoneTypeValueMobile;
+                    $objectToMapTo->{$toNumberKey} = $extractAndFormatNumber($srcObject->{$fromMobileKey}, $srcObject->{$fromMobileAreaKey});
+                    $objectToMapTo->{$toAreaKey} = $srcObject->{$fromMobileAreaKey};
+                }
+
+                return $objectToMapTo;
+            }
         };
     }
 

@@ -85,11 +85,6 @@ class Api
             $srcValue = $srcObject->{$scrKey};
             settype($srcValue, ($toAttributeDefinition->type));
 
-            if($scrKey === "semester") {
-                echo $toAttributeDefinition->name;
-                echo "semsetermapping".$srcValue;
-            }
-
             $newObject->{$toAttributeDefinition->name} = $srcValue;
             echo "mapped srcKeyToNewKey " . $scrKey . " - " . $toAttributeDefinition->name . PHP_EOL;
         }

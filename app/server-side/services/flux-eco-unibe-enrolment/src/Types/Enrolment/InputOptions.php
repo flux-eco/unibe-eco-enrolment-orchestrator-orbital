@@ -13,8 +13,12 @@ final readonly class InputOptions
         public FluxEcoDefinitionItem $subjects,
         public FluxEcoDefinitionItem $subjectCombinations,
         public FluxEcoDefinitionItem $places,
-        public FluxEcoDefinitionItem $motherLanguage,
-        public FluxEcoDefinitionItem $correspondenceLanguage
+        public FluxEcoDefinitionItem $originPlaces,
+        public FluxEcoDefinitionItem $motherLanguages,
+        public FluxEcoDefinitionItem $correspondenceLanguages,
+        public FluxEcoDefinitionItem $countries,
+        public FluxEcoDefinitionItem $areaCodes,
+        public FluxEcoDefinitionItem $nationalities
     )
     {
 
@@ -30,8 +34,12 @@ final readonly class InputOptions
             FluxEcoDefinitionItem::new("subjects", FluxEcoFilePathDefinition::new($inputOptionsDirectory, "subjects.json")),
             FluxEcoDefinitionItem::new("subject-combinations", FluxEcoFilePathDefinition::new($inputOptionsDirectory, "subject-combinations.json")),
             FluxEcoDefinitionItem::new("places", FluxEcoFilePathDefinition::new($inputOptionsDirectory, "places.json")),
-            FluxEcoDefinitionItem::new("motherLanguage", FluxEcoFilePathDefinition::new($inputOptionsDirectory, "motherLanguage.json")),
-            FluxEcoDefinitionItem::new("correspondenceLanguage", FluxEcoFilePathDefinition::new($inputOptionsDirectory, "correspondenceLanguage.json")),
+            FluxEcoDefinitionItem::new("origin-places", FluxEcoFilePathDefinition::new($inputOptionsDirectory, "origin-places.json")),
+            FluxEcoDefinitionItem::new("mother-languages", FluxEcoFilePathDefinition::new($inputOptionsDirectory, "mother-languages.json")),
+            FluxEcoDefinitionItem::new("correspondence-languages", FluxEcoFilePathDefinition::new($inputOptionsDirectory, "correspondence-languages.json")),
+            FluxEcoDefinitionItem::new("countries", FluxEcoFilePathDefinition::new($inputOptionsDirectory, "countries.json")),
+            FluxEcoDefinitionItem::new("area-codes", FluxEcoFilePathDefinition::new($inputOptionsDirectory, "area-codes.json")),
+            FluxEcoDefinitionItem::new("nationalities", FluxEcoFilePathDefinition::new($inputOptionsDirectory, "nationalities.json")),
         );
     }
 }

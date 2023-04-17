@@ -8,6 +8,10 @@
  * - WorkflowOutputDefinition aufsplitten und bei page platzieren -> via json pro page AttributesDefinition.php laden; Mapper umstellen. Validierung ?direkt? - eher vor dem mapper und validatet-daten übergeben
  */
 
+/**
+ * discuss with emmmet
+ * unibe backend compares password -> encryption type?
+ */
 
 /**
  * CertificateDataAttributesDefinition

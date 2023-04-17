@@ -1,0 +1,25 @@
+{
+  "menu": {
+    "ids": [
+      "application-login"
+    ],
+    "id": "application-login"
+  },
+  "page": "university-entrance-qualification",
+  "data": {
+    "data": {
+      "$ref": "../input-options/university-entrance-qualification-data.json"
+    },
+    "select-to-data": {
+      "$ref": "../input-options/university-entrance-qualification-select-to-data.json"
+    },
+    "selects": {
+      "$ref": "../input-options/university-entrance-qualification-selects.json"
+    },
+    "select-index": 309,
+    "values": null
+  },
+  "user-name": "3432234",
+  "can-back": true,
+  "can-logout": true
+}

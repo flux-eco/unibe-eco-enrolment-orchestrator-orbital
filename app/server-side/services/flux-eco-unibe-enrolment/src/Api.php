@@ -3,7 +3,9 @@
 namespace FluxEco\UnibeEnrolment;
 
 use Exception;
+use FluxEcoType\FluxEcoDefinitionItem;
 use FluxEcoType\FluxEcoTransactionStateObject;
+use stdClass;
 
 final readonly class Api
 {
@@ -28,14 +30,9 @@ final readonly class Api
     public function readPage(FluxEcoTransactionStateObject $transactionStateObject): string
     {
         $pages = $this->config->settings->enrolmentDefinition->pages;
-        if ($transactionStateObject->transactionId === null) {
-            return $this->config->outbounds->processReadJsonFile(
-                $pages->start->stateFilePath->directoryPath, $pages->start->stateFilePath->fileName
-            );
-        }
+        $pageDefinition = $pages->getPageByName($transactionStateObject->currentPageName);
 
-        $nextPageAttributeDefinition = $pages->{$this->config->settings->enrolmentDefinition->workflow->getNextPage($transactionStateObject->lastHandledPage, $transactionStateObject)};
-        $pageJson = $this->config->outbounds->processReadJsonFile($nextPageAttributeDefinition->stateFilePath->directoryPath, $nextPageAttributeDefinition->stateFilePath->fileName);
+        $pageJson = $this->config->outbounds->processReadJsonFile($pageDefinition->stateFilePath->directoryPath, $pageDefinition->stateFilePath->fileName);
         return json_encode(
             $this->appendDebugData(
                 $this->resolveDynamicData(
@@ -50,32 +47,38 @@ final readonly class Api
     /**
      * @throws Exception
      */
-    public function storeData(string $currentPage, FluxEcoTransactionStateObject $transactionStateObject, object $dataToProcess): object
+    public function storeData(FluxEcoTransactionStateObject $transactionStateObject, object $processData): object
     {
         if ($transactionStateObject->data === null) {
-            return $this->createEnrolment($currentPage, $transactionStateObject, $dataToProcess);
+            return $this->createEnrolment($transactionStateObject, $processData);
         }
-        return $this->updateEnrolment($currentPage, $transactionStateObject, $dataToProcess);
+        return $this->updateEnrolment($transactionStateObject, $processData);
     }
 
-    private function createEnrolment(string $currentPage, FluxEcoTransactionStateObject $transactionStateObject, object $dataToProcess): object
-    {
-        $createdStateData = $this->config->outbounds->processCreateEnrolment($currentPage, $transactionStateObject, $dataToProcess);
+    public function readPreviousEnrolment(string $transactionId, object $processData): object {
+        $password =  md5($processData->password); //todo choose another encryption type
+        return $this->config->outbounds->processReadResumeEnrolmentData($transactionId, $processData->{'identification-number'} ,$password); //todo see WorkflowDefinition
+    }
 
-        print_r($createdStateData);
+    private function createEnrolment(FluxEcoTransactionStateObject $transactionStateObject, object $processData): object
+    {
+        $password =  md5($processData->password); //todo choose another encryption type
+        $createdStateData = $this->config->outbounds->processCreateEnrolment($transactionStateObject, $password);
 
         $createdTransactionStateObject = FluxEcoTransactionStateObject::createNew(
             $transactionStateObject->transactionId,
             $createdStateData,
-            $currentPage
+            [$transactionStateObject->currentPageName],
+            $transactionStateObject->currentPageName
         );
+
         //update Enrolment - e.g. to store the semester
-        return $this->updateEnrolment($currentPage, $createdTransactionStateObject, $dataToProcess);
+        return $this->updateEnrolment($createdTransactionStateObject, new stdClass());
     }
 
-    private function updateEnrolment($currentPage, FluxEcoTransactionStateObject $transactionStateObject, object $dataToProcess): object
+    private function updateEnrolment(FluxEcoTransactionStateObject $transactionStateObject, object $dataToProcess): object
     {
-        return $this->config->outbounds->processUpdateEnrolment($currentPage, $transactionStateObject, $dataToProcess, $this->config->settings->enrolmentDefinition->outputDataObjectDefinition);
+        return $this->config->outbounds->processUpdateEnrolment($transactionStateObject, $dataToProcess, $this->config->settings->enrolmentDefinition->outputDataObjectDefinition);
     }
 
     public function readLayout(): string

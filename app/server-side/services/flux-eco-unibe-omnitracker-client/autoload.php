@@ -3,7 +3,7 @@
 spl_autoload_register(function (string $class) {
     $namespace = "FluxEco\\UnibeOmnitrackerClient";
     $baseDirectory = __DIR__.'/src';
-    loadUnibeOmnitrackerClientClassFiles($namespace, $class, $baseDirectory);
+    loadPhonenumberClassFiles($namespace, $class, $baseDirectory);
 });
 
 /**

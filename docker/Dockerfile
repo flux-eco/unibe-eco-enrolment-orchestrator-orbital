@@ -1,4 +1,4 @@
-FROM fluxms/flux-eco-biotope:v2022-04-09-4 AS unibe-eco-enrolment-orchestrator-orbital
+FROM fluxms/flux-eco-biotope:v2022-04-16-1 AS unibe-eco-enrolment-orchestrator-orbital
 USER root
 
 # |-------------------------------------------------------------------------- \
@@ -25,7 +25,7 @@ ENTRYPOINT ["sh", "./docker_entrypoint.sh"]
 
 COPY ./app /opt/unibe-eco-enrolment-orchestrator-orbital/app
 
-RUN (cd /var/www/html && wget -O - https://github.com/fluxfw/flux-studis-selfservice-frontend/releases/download/v2023-03-24-1/flux-studis-selfservice-frontend-v2023-03-24-1-build.tar.gz| tar -xz --strip-components=1)
+RUN (cd /var/www/html && wget -O - https://github.com/fluxfw/flux-studis-selfservice-frontend/releases/download/v2023-04-12-1/flux-studis-selfservice-frontend-v2023-04-12-1-build.tar.gz| tar -xz --strip-components=1)
 COPY ./docker/assets/logo.svg /var/www/html/Adapter/Logo/logo.svg
 
 #RUN chown -R flux-eco:flux-eco "/opt/unibe-eco-enrolment-orchestrator-orbital/configs/reference-objects"

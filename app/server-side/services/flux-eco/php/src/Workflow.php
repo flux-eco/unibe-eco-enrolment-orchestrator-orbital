@@ -6,13 +6,20 @@ use Exception;
 
 final readonly class Workflow
 {
+    //todo $nextPageNames should be pageProcessDefinition
+    // ProcessDefinition
+    // @property object $processDataDefinition
+    // @property string $nextPageName
 
     /**
-     * @param FluxEcoWorkflowDefinitionNextPageAsPropertyName[] $nextPageNames
+     * @param FluxEcoWorkflowDefinitionNextPageName[] $nextPageNames
      */
     private function __construct(
         public string $startPageName,
         private array $nextPageNames,
+        public string $lastPageName,
+        public string $resumePageName,
+        public string $workflowStateLastHandledPageAttributeName
     )
     {
 
@@ -20,14 +27,17 @@ final readonly class Workflow
 
 
     /**
-     * @param FluxEcoWorkflowDefinitionNextPageAsPropertyName[] $nextPageNames
+     * @param FluxEcoWorkflowDefinitionNextPageName[] $nextPageNames
      * An associative array with key as previous handled page name and value as the next page name.
      * Value can be either a string indicating the next page or a closure that takes a
      * FluxEcoTransactionStateObject parameter and returns the next page name as a string.
      */
     public static function new(
         string $startPageName,
-        array $nextPageNames
+        array $nextPageNames,
+        string $lastPageName,
+        string $resumePageName,
+        string $workflowStateLastHandledPageAttributeName
     ): self
     {
         return new self(...get_defined_vars());
@@ -36,7 +46,7 @@ final readonly class Workflow
     /**
      * @throws Exception
      */
-    public function getNextPage(?string $lastHandledPage, FluxEcoTransactionStateObject $transactionStateObject): string
+    public function getNextPageName(?string $lastHandledPage, FluxEcoTransactionStateObject $transactionStateObject): string
     {
         if($lastHandledPage === null) {
             return $this->startPageName;
@@ -45,6 +55,6 @@ final readonly class Workflow
         if (array_key_exists($lastHandledPage, $this->nextPageNames) === false) {
             throw new Exception("no further page found - last handled page: " . $lastHandledPage. " searched in: ".print_r($this->nextPageNames, true));
         }
-        return $this->nextPageNames[$lastHandledPage]->getNextPageAsPropertyName($transactionStateObject);
+        return $this->nextPageNames[$lastHandledPage]->getNextPageName($transactionStateObject);
     }
 }

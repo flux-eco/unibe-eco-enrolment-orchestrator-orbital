@@ -1,4 +1,8 @@
 <?php
+
+use FluxEcoType\FluxEcoAttributeDefinition;
+use libphonenumber\PhoneNumberUtil;
+
 require_once __DIR__ . "/autoload.php";
 $dataDirectory = __DIR__ . "/data/configs";
 $config = Config::new();
@@ -16,16 +20,29 @@ $writeJsonFile = function (FluxEcoType\FluxEcoFilePathDefinition $filePathDefini
     );
 };
 
-/*
-$writeJsonFile($enrolmentDefinition->inputOptions->salutations->stateFilePath, $omnitrackerClient->readSalutations());
-$writeJsonFile($enrolmentDefinition->inputOptions->semesters->stateFilePath, $omnitrackerClient->readSemesters());
+$readPhoneNumberCountryCodes = function() {
+    $phoneNumberUtil = PhoneNumberUtil::getInstance(PhoneNumberUtil::META_DATA_FILE_PREFIX);
+    $idLabelList = [];
+    foreach($phoneNumberUtil->getSupportedCallingCodes() as $callingCode) {
+        $idLabelObject = new stdClass();
+        $idLabelObject->id = $callingCode;
+        $idLabelObject->label = "+".$callingCode;
+        $idLabelList[] = $idLabelObject;
+    }
+    return $idLabelList;
+};
+
+$writeJsonFile($enrolmentDefinition->inputOptions->salutations->stateFilePath, $omnitrackerClient->readSalutations(), []);
+$writeJsonFile($enrolmentDefinition->inputOptions->semesters->stateFilePath, $omnitrackerClient->readSemesters(), []);
 $writeJsonFile($enrolmentDefinition->inputOptions->subjects->stateFilePath, $omnitrackerClient->readSubjects(), []);
 $writeJsonFile($enrolmentDefinition->inputOptions->subjectCombinations->stateFilePath, $omnitrackerClient->readSubjectCombinations(), []);
-*/
+$writeJsonFile($enrolmentDefinition->inputOptions->originPlaces->stateFilePath, $omnitrackerClient->readOriginPlaces(), []);
 $writeJsonFile($enrolmentDefinition->inputOptions->places->stateFilePath, $omnitrackerClient->readPlaces(), []);
-$writeJsonFile($enrolmentDefinition->inputOptions->motherLanguage->stateFilePath, $omnitrackerClient->readMotherLanguage(), []);
-$writeJsonFile($enrolmentDefinition->inputOptions->correspondenceLanguage->stateFilePath, $omnitrackerClient->readCorrespondenceLanguage(), []);
-
+$writeJsonFile($enrolmentDefinition->inputOptions->motherLanguages->stateFilePath, $omnitrackerClient->readMotherLanguage(), []);
+$writeJsonFile($enrolmentDefinition->inputOptions->correspondenceLanguages->stateFilePath, $omnitrackerClient->readCorrespondenceLanguage(), []);
+$writeJsonFile($enrolmentDefinition->inputOptions->countries->stateFilePath, $omnitrackerClient->readCountries(), []);
+$writeJsonFile($enrolmentDefinition->inputOptions->areaCodes->stateFilePath, $readPhoneNumberCountryCodes(), []);
+$writeJsonFile($enrolmentDefinition->inputOptions->nationalities->stateFilePath, $omnitrackerClient->readNationalities(), []);
 
 
 
