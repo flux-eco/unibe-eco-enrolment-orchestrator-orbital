@@ -1,9 +1,10 @@
 <?php
 
 namespace FluxEco\UnibeEnrolment;
+
 /**
  * @property string $identificationNumber
- * @property string $oldAgeSurvivorInsuranceNumber
+ * @property string $oldAgeSurvivarInsuranceNumber
  * @property int $salutation
  * @property string $parentsAddressExtraAddressLine
  * @property int $parentsAddressSalutation
@@ -69,8 +70,8 @@ namespace FluxEco\UnibeEnrolment;
  * @property int $issueYear
  * @property int $maturaCanton
  * @property int $upperSecondarySchool
+ * @property string $registrationNumber
  */
-
 interface StateDataEnrolment {
 
 }

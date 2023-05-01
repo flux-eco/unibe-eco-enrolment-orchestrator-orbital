@@ -366,7 +366,12 @@ final readonly class State
     public function processPersonalData(FluxEcoStateValues|stdClass $stateValues, object $dataToProcess, callable $storeNewEnrolment, callable $updateEnrolment, callable $objectFromJsonFile, string $pageDataDirectory): array
     {
         $stateValues = FluxEcoStateMonad::changeCurrentStateName($stateValues, $this->stateNames->processPersonalData);
-        //todo
+
+        //validation is made by omnitracker backend
+        $stateData = $stateValues->data;
+        $stateData->enrolmentData = $updateEnrolment($stateValues, $stateValues->data->transactionId, $dataToProcess->data);
+        $stateValues = FluxEcoStateMonad::setStateData($stateValues, $stateData);
+
         return [FluxEcoStateMonad::markStateAsCompleted($stateValues, $this->stateNames->processPersonalData), fn($stateValues) => $this->legal($stateValues, $objectFromJsonFile, $pageDataDirectory)];
     }
 
@@ -380,6 +385,8 @@ final readonly class State
         $stateData = $stateValues->data;
         $stateData->content = $this->readPageContent($stateValues, $stateValues->currentStateName, $objectFromJsonFile, $pageDataDirectory);
         $stateValues = FluxEcoStateMonad::setStateData($stateValues, $stateData);
+
+
 
         return [FluxEcoStateMonad::markStateAsCompleted($stateValues, $this->stateNames->legal), null];
     }

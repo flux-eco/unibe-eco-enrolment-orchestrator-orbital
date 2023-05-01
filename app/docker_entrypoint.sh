@@ -5,5 +5,5 @@ function configure {
   php server-side/configure.php
 }
 
-configure
+#configure
 flux-eco-http-synapse.start

@@ -155,13 +155,6 @@ final class State
          * @var StateValues|stdClass $stateValues
          */
         $stateValues = FluxEcoStateMonad::changeCurrentStateName($stateValues, $this->stateNames->storeTransactionStateValues);
-
-        echo "storeTransactionStateValues".PHP_EOL;
-        echo $transactionIdCookieName.PHP_EOL;
-        echo $transactionId.PHP_EOL;
-        print_r($transactionStateValues);
-        echo PHP_EOL;
-
         $storeCookie($transactionIdCookieName, $transactionId);
         $storeTransactionStateValuesInCache($transactionId, $transactionStateValues);
 
@@ -236,9 +229,6 @@ final class State
         $transactionId = $readCookie($transactionIdCookieName);
         $transactionStateValues = $readTransactionStateValuesFromCache($transactionId);
 
-        echo "setTransactionStateValues".PHP_EOL;
-        print_r($transactionStateValues);
-
         if ($readCookie($transactionIdCookieName) === null || $transactionStateValues === null) {
             $stateData->transactionStateValues = null;
             $stateValues = FluxEcoStateMonad::setStateData($stateValues, $stateData);
@@ -255,9 +245,6 @@ final class State
      */
     public function updateTransactionStateValuesFromTransactionStateManager(StateValues|stdClass $stateValues, null|FluxEcoStateValues|stdClass $transactionStateValues, callable $readTransactionStateValuesFromManager): array
     {
-        echo "updateTransactionStateValues".PHP_EOL;
-        print_r($transactionStateValues);
-
         /**
          * @var StateValues|stdClass $stateValues
          */

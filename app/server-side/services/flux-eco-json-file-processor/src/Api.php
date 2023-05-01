@@ -5,6 +5,10 @@ namespace FluxEco\JsonFileProcessor;
 use Exception;
 use JsonSerializable;
 
+//todo
+//schema resolveRef
+//states resolveLink $link
+
 class Api
 {
 
@@ -63,7 +67,7 @@ class Api
         }
 
         if (!in_array(fileowner($absoluteFilePath), $this->allowedUsers)) {
-            throw new Exception("Access denied: " . $absoluteFilePath. "file owner ".fileowner($absoluteFilePath). " allowed users ".print_r($this->allowedUsers, true));
+            throw new Exception("Access denied: " . $absoluteFilePath . "file owner " . fileowner($absoluteFilePath) . " allowed users " . print_r($this->allowedUsers, true));
         }
 
         return $absoluteFilePath;
@@ -72,7 +76,7 @@ class Api
     /**
      * @throws Exception
      */
-    public function readJsonFile(string $directoryPath, string $jsonFileName): string
+    public function readJsonFile(string $directoryPath, string $jsonFileName): object|array
     {
         $absoluteJsonFilePath = $this->getAbsoluteFilePath($directoryPath, $jsonFileName);
 
@@ -84,7 +88,44 @@ class Api
         }
         $resolvedRefs = $this->resolveRefs($decodedJson, $absoluteJsonFilePath);
 
-        return json_encode($resolvedRefs);
+        return $resolvedRefs;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function readJsonSchemeDefaults(string $directoryPath, string $jsonFileName): object
+    {
+        $jsonObject = $this->readJsonFile($directoryPath, $jsonFileName);
+        return $this->readDefaults($jsonObject);
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function readDefaults(object|array $data): object|array
+    {
+        if (is_object($data) === true) {
+            $dataItems = get_object_vars($data->properties);
+        } else {
+            $dataItems = $data;
+        }
+
+        $resolvedDefaultData = new \stdClass();
+        foreach ($dataItems as $key => $value) {
+            if (is_object($value) === true) {
+                if (property_exists($value, 'default')) {
+                    $resolvedDefaultData->{"$key"} = $value->{'default'};
+                    continue;
+                }
+            }
+        }
+
+
+        if (is_object($data) === true) {
+            return $resolvedDefaultData;
+        }
+        return (array)$resolvedDefaultData;
     }
 
     /**
@@ -106,7 +147,7 @@ class Api
                     $refPath = $value->{'$ref'};
                     $refFileName = pathinfo($refPath, PATHINFO_BASENAME);
                     $dirName = realpath(implode("/", [pathinfo($currentFilePath, PATHINFO_DIRNAME), pathinfo($refPath, PATHINFO_DIRNAME)]));
-                    $resolvedRefsData->{"$key"} = json_decode($this->readJsonFile($dirName, $refFileName));
+                    $resolvedRefsData->{"$key"} = $this->readJsonFile($dirName, $refFileName);
                     continue;
                 }
                 $resolvedRefsData->{"$key"} = $this->resolveRefs($value, $currentFilePath);

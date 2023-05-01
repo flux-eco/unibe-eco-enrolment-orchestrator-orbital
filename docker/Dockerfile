@@ -1,4 +1,4 @@
-FROM fluxms/flux-eco-biotope:v2022-04-16-1 AS unibe-eco-enrolment-orchestrator-orbital
+FROM fluxms/flux-eco-biotope:v2023-05-01-1 AS unibe-eco-enrolment-orchestrator-orbital
 USER root
 
 # |-------------------------------------------------------------------------- \
@@ -9,7 +9,7 @@ USER root
 # | General Environment Variables
 # |-------------------------------------------------------------------------- \
 ENV FLUX_ECO_HTTP_SYNAPSE_AUTOLOAD_FILE_PATH=/opt/unibe-eco-enrolment-orchestrator-orbital/app/autoload.php
-ENV FLUX_ECO_HTTP_SYNAPSE_HTTP_API_FQCN=HttpApi
+ENV FLUX_ECO_HTTP_SYNAPSE_HTTP_API_FQCN=Api
 
 ENV FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_DATA_DIRECTORY_PATH=/opt/unibe-eco-enrolment-orchestrator-orbital/app/server-side/data
 ENV FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_SOAP_WSDL_SERVER_HOST_FILE=/opt/unibe-eco-enrolment-orchestrator-orbital/secrets/soap-wsdl-server-host
@@ -20,6 +20,9 @@ ENV FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_SOAP_SERVER_HOST_FILE=/opt/unibe-eco
 
 ENV FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_SOAP_USER_FILE=/opt/unibe-eco-enrolment-orchestrator-orbital/secrets/soap-user
 ENV FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_SOAP_PASSWORD_FILE=/opt/unibe-eco-enrolment-orchestrator-orbital/secrets/soap-password
+
+ENV FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_MIN_DATA_MAX_YEARS_IN_PAST = 20;
+ENV FLUX_ECO_ENROLMENT_ORCHESTRATOR_ORBITAL_END_DATE_MAX_YEARS_IN_FUTURE = 0;
 
 ENTRYPOINT ["sh", "./docker_entrypoint.sh"]
 

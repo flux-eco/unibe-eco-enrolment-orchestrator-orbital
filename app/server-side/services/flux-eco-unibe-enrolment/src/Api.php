@@ -34,14 +34,7 @@ final readonly class Api
 
     public function processData(StateValues|stdClass $stateValues, object $processData, callable $storeNewEnrolment, callable $updateEnrolment, callable $objectFromJsonFile): FluxEcoStateValues|stdClass
     {
-        echo "processData" . PHP_EOL;
-        print_r($processData);
-        echo PHP_EOL;
-        $processedData = $this->state->processData($stateValues, $processData, $storeNewEnrolment, $updateEnrolment, $objectFromJsonFile);
-        echo "processedData" . PHP_EOL;
-        print_r($processedData);
-        echo PHP_EOL;
-        return $processedData;
+        return $this->state->processData($stateValues, $processData, $storeNewEnrolment, $updateEnrolment, $objectFromJsonFile);
     }
 
 }

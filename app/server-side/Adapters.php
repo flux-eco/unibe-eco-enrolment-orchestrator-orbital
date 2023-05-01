@@ -5,6 +5,9 @@ use FluxEco\JsonFileProcessor;
 use FluxEco\HttpWorkflowRequestHandler;
 use FluxEco\UnibeOmnitrackerClient;
 use FluxEcoType\FluxEcoStateValues;
+use libphonenumber\NumberParseException;
+use libphonenumber\PhoneNumberFormat;
+use libphonenumber\PhoneNumberUtil;
 
 final readonly class Adapters
 {
@@ -96,8 +99,10 @@ final readonly class Adapters
                 'expiration' => time() + 3600
             ]);
 
+            /**
+             * todo if debug
+             */
             echo "stored in cache" . PHP_EOL;
-
             print_r(json_decode($transactionDataCache->get($transactionId)['state']));
         };
     }
@@ -131,36 +136,11 @@ final readonly class Adapters
          */
         $enrolmentData = new stdClass();
         $enrolmentData->identificationNumber = $omnitrackerEnrolmentData->Identifikationsnummer;
-        $enrolmentData->oldAgeSurvivorInsuranceNumber = $omnitrackerEnrolmentData->AHV;
-        $enrolmentData->salutation = $omnitrackerEnrolmentData->Anrede;
-        $enrolmentData->parentsAddressExtraAddressLine = $omnitrackerEnrolmentData->ElternAdresszusatz;
-        $enrolmentData->parentsAddressSalutation = $omnitrackerEnrolmentData->ElternAnrede;
-        $enrolmentData->parentsAddressCountry = $omnitrackerEnrolmentData->ElternLandUniqueId;
-        $enrolmentData->parentsAddressLastName = $omnitrackerEnrolmentData->ElternNachname;
-        $enrolmentData->parentsAddressPlace = $omnitrackerEnrolmentData->ElternOrtUniqueId;
-        $enrolmentData->parentsAddressPostalCode = $omnitrackerEnrolmentData->ElternPLZ;
-        $enrolmentData->parentsAddressStreet = $omnitrackerEnrolmentData->ElternStrasse;
-        $enrolmentData->parentsAddressFirstNames = $omnitrackerEnrolmentData->ElternVorname;
-        $enrolmentData->email = $omnitrackerEnrolmentData->EmailPrivat;
-        $enrolmentData->birthDate = $omnitrackerEnrolmentData->Geburtstag;
         //$enrolmentData->GeneralNotes = $omnitrackerEnrolmentData->GeneralNotes;
-        $enrolmentData->originPlace = $omnitrackerEnrolmentData->HeimatortUniqueId;
-        $enrolmentData->correspondenceLanguage = $omnitrackerEnrolmentData->KorrespondenzspracheUniqueId;
-        $enrolmentData->country = $omnitrackerEnrolmentData->LandUniqueId;
         $enrolmentData->lastCompletedController = $omnitrackerEnrolmentData->LastCompletedController;
         $enrolmentData->mobilitaetHeimuniUniqueId = $omnitrackerEnrolmentData->MobilitaetHeimuniUniqueId;
-        $enrolmentData->motherLanguage = $omnitrackerEnrolmentData->MutterspracheUniqueId;
-        $enrolmentData->lastName = $omnitrackerEnrolmentData->Nachname;
-        $enrolmentData->nationally = $omnitrackerEnrolmentData->NationalitaetUniqueId;
         $enrolmentData->parallelstudium = $omnitrackerEnrolmentData->Parallelstudium;
-        $enrolmentData->parentsAddressGeneralPost = $omnitrackerEnrolmentData->PostEltern;
-        $enrolmentData->parentsAddressInvoices = $omnitrackerEnrolmentData->RechnungEltern;
         $enrolmentData->semester = $omnitrackerEnrolmentData->SemesterUniqueId;
-        $enrolmentData->extraAddressLine = $omnitrackerEnrolmentData->StudentAdresszusatz;
-        $enrolmentData->place = $omnitrackerEnrolmentData->StudentOrtUniqueId;
-        $enrolmentData->postalCode = $omnitrackerEnrolmentData->StudentPLZ;
-        $enrolmentData->postalOfficeBox = $omnitrackerEnrolmentData->StudentPostfach;
-        $enrolmentData->street = $omnitrackerEnrolmentData->StudentStrasse;
         $enrolmentData->studiengangsversionParallelUniqueId = $omnitrackerEnrolmentData->StudiengangsversionParallelUniqueId;
         $enrolmentData->subject = $omnitrackerEnrolmentData->StudiengangsversionUniqueId;
         $enrolmentData->subjectTitle = $omnitrackerEnrolmentData->Studiengangsversion;
@@ -173,51 +153,70 @@ final readonly class Adapters
         $enrolmentData->studienstrukturParallelUniqueId = $omnitrackerEnrolmentData->StudienstrukturParallelUniqueId;
         $enrolmentData->studienstufeBFS = $omnitrackerEnrolmentData->StudienstufeBFS;
         $enrolmentData->degreeProgram = $omnitrackerEnrolmentData->StudienstufeUniqueId;
-        $enrolmentData->homePhoneAreaCode = $omnitrackerEnrolmentData->Telefon;
-        $enrolmentData->homePhoneNumber = $omnitrackerEnrolmentData->TelefonTyp;
         $enrolmentData->vorbildungMasterabschluss = $omnitrackerEnrolmentData->VorbildungMasterabschluss;
+
+        /**
+         * Personal Data
+         */
+        $enrolmentData->salutation = $omnitrackerEnrolmentData->AnredeUniqueId;
         $enrolmentData->firstName = $omnitrackerEnrolmentData->Vorname;
+        $enrolmentData->secondFirstName = $omnitrackerEnrolmentData->Vorname2;
+        $enrolmentData->additionalFirstNames = $this->mapCommaSeparatedStringToArray($omnitrackerEnrolmentData->Vorname3);
+        $enrolmentData->lastName = $omnitrackerEnrolmentData->Nachname;
+        $enrolmentData->registrationNumber = $omnitrackerEnrolmentData->Matrikelnummer;
+        $enrolmentData->country = $omnitrackerEnrolmentData->LandUniqueId;
+        $enrolmentData->extraAddressLine = $omnitrackerEnrolmentData->StudentAdresszusatz;
+        $enrolmentData->street = $this->extractStringFromStringSpaceNumberString($omnitrackerEnrolmentData->StudentStrasse);
+        $enrolmentData->houseNumber = $this->extractNumberFromStringSpaceNumberString($omnitrackerEnrolmentData->StudentStrasse);
+        $enrolmentData->postalOfficeBox = $omnitrackerEnrolmentData->StudentPostfach;
+        $enrolmentData->postalCode = $omnitrackerEnrolmentData->StudentPLZ;
+        $enrolmentData->place = $omnitrackerEnrolmentData->StudentOrtUniqueId;
+        $enrolmentData->businessPhoneAreaCode = $this->mapPhoneNumberToAreaCode($omnitrackerEnrolmentData->Telefon, $omnitrackerEnrolmentData->TelefonTyp, "business");
+        $enrolmentData->businessPhoneNumber = $this->removeAreaCodeFromPhoneNumber($omnitrackerEnrolmentData->Telefon, $omnitrackerEnrolmentData->TelefonTyp, "business");
+        $enrolmentData->homePhoneAreaCode = $this->mapPhoneNumberToAreaCode($omnitrackerEnrolmentData->Telefon, $omnitrackerEnrolmentData->TelefonTyp, "home");
+        $enrolmentData->homePhoneNumber = $this->removeAreaCodeFromPhoneNumber($omnitrackerEnrolmentData->Telefon, $omnitrackerEnrolmentData->TelefonTyp, "home");
+        $enrolmentData->mobilePhoneAreaCode = $this->mapPhoneNumberToAreaCode($omnitrackerEnrolmentData->Telefon, $omnitrackerEnrolmentData->TelefonTyp, "mobile");
+        $enrolmentData->mobilePhoneNumber = $this->removeAreaCodeFromPhoneNumber($omnitrackerEnrolmentData->Telefon, $omnitrackerEnrolmentData->TelefonTyp, "mobile");
+        $enrolmentData->email = $omnitrackerEnrolmentData->EmailPrivat;
+        $enrolmentData->motherLanguage = $omnitrackerEnrolmentData->MutterspracheUniqueId;
+        $enrolmentData->correspondenceLanguage = $omnitrackerEnrolmentData->KorrespondenzspracheUniqueId;
+        $enrolmentData->birthDate = $omnitrackerEnrolmentData->Geburtstag;
+        $enrolmentData->oldAgeSurvivarInsuranceNumber = $omnitrackerEnrolmentData->AHV; //todo check
+        $enrolmentData->nationally = $omnitrackerEnrolmentData->NationalitaetUniqueId;
+        $enrolmentData->originPlace = $omnitrackerEnrolmentData->HeimatortUniqueId;
+        //parents-adress true?
+        $enrolmentData->parentsAddressSalutation = $omnitrackerEnrolmentData->ElternAnredeUniqueId;
+        $enrolmentData->parentsAddressFirstNames = $this->mapCommaSeparatedStringToArray($omnitrackerEnrolmentData->ElternVorname);
+        $enrolmentData->parentsAddressLastName = $omnitrackerEnrolmentData->ElternNachname;
+        //"parents-address-same-address": false ?
+        $enrolmentData->parentsAddressCountry = $omnitrackerEnrolmentData->ElternLandUniqueId;
+        $enrolmentData->parentsAddressExtraAddressLine = $omnitrackerEnrolmentData->ElternAdresszusatz;
+        $enrolmentData->parentsAddressStreet = $this->extractStringFromStringSpaceNumberString($omnitrackerEnrolmentData->ElternStrasse);
+        $enrolmentData->parentsAddressHouseNumber = $this->extractNumberFromStringSpaceNumberString($omnitrackerEnrolmentData->ElternStrasse);
+        $enrolmentData->parentsAddressPostalCode = $omnitrackerEnrolmentData->ElternPLZ;
+        $enrolmentData->parentsAddressPlace = $omnitrackerEnrolmentData->ElternOrtUniqueId;
+        $enrolmentData->parentsAddressGeneralPost = (bool)$omnitrackerEnrolmentData->PostEltern;
+        $enrolmentData->parentsAddressInvoices = (bool)$omnitrackerEnrolmentData->RechnungEltern;
 
         return $enrolmentData;
     }
 
+    /**
+     * @throws NumberParseException
+     * @throws Exception
+     */
     public function mapUnibeEnrolmentOmnitrackerEnrolment(FluxEco\UnibeEnrolment\StateDataEnrolment|stdClass $enrolmentData): UnibeEnrolment\StateDataEnrolment|stdClass
     {
         /**
-         * @var FluxEco\UnibeEnrolment\StateDataEnrolment|stdClass $omnitrackerEnrolmentData
+         * @var FluxEco\UnibeOmnitrackerClient\StateDataEnrolment|stdClass $omnitrackerEnrolmentData
          */
         $omnitrackerEnrolmentData = new stdClass();
         $omnitrackerEnrolmentData->Identifikationsnummer = $enrolmentData->identificationNumber;
-        $omnitrackerEnrolmentData->AHV = $enrolmentData->oldAgeSurvivorInsuranceNumber;
-        $omnitrackerEnrolmentData->Anrede = $enrolmentData->salutation;
-        $omnitrackerEnrolmentData->ElternAdresszusatz = $enrolmentData->parentsAddressExtraAddressLine;
-        $omnitrackerEnrolmentData->ElternAnrede = $enrolmentData->parentsAddressSalutation;
-        $omnitrackerEnrolmentData->ElternLandUniqueId = $enrolmentData->parentsAddressCountry;
-        $omnitrackerEnrolmentData->ElternNachname = $enrolmentData->parentsAddressLastName;
-        $omnitrackerEnrolmentData->ElternOrtUniqueId = $enrolmentData->parentsAddressPlace;
-        $omnitrackerEnrolmentData->ElternPLZ = $enrolmentData->parentsAddressPostalCode;
-        $omnitrackerEnrolmentData->ElternStrasse = $enrolmentData->parentsAddressStreet;
-        $omnitrackerEnrolmentData->ElternVorname = $enrolmentData->parentsAddressFirstNames;
-        $omnitrackerEnrolmentData->EmailPrivat = $enrolmentData->email;
-        $omnitrackerEnrolmentData->Geburtstag = $enrolmentData->birthDate;
         //$omnitrackerEnrolmentData->GeneralNotes = $enrolmentData->GeneralNotes;
-        $omnitrackerEnrolmentData->HeimatortUniqueId = $enrolmentData->originPlace;
-        $omnitrackerEnrolmentData->KorrespondenzspracheUniqueId = $enrolmentData->correspondenceLanguage;
-        $omnitrackerEnrolmentData->LandUniqueId = $enrolmentData->country;
         $omnitrackerEnrolmentData->LastCompletedController = $enrolmentData->lastCompletedController;
         $omnitrackerEnrolmentData->MobilitaetHeimuniUniqueId = $enrolmentData->mobilitaetHeimuniUniqueId;
-        $omnitrackerEnrolmentData->MutterspracheUniqueId = $enrolmentData->motherLanguage;
-        $omnitrackerEnrolmentData->Nachname = $enrolmentData->lastName;
-        $omnitrackerEnrolmentData->NationalitaetUniqueId = $enrolmentData->nationally;
         $omnitrackerEnrolmentData->Parallelstudium = $enrolmentData->parallelstudium;
-        $omnitrackerEnrolmentData->PostEltern = $enrolmentData->parentsAddressGeneralPost;
-        $omnitrackerEnrolmentData->RechnungEltern = $enrolmentData->parentsAddressInvoices;
         $omnitrackerEnrolmentData->SemesterUniqueId = $enrolmentData->semester;
-        $omnitrackerEnrolmentData->StudentAdresszusatz = $enrolmentData->extraAddressLine;
-        $omnitrackerEnrolmentData->StudentOrtUniqueId = $enrolmentData->place;
-        $omnitrackerEnrolmentData->StudentPLZ = $enrolmentData->postalCode;
-        $omnitrackerEnrolmentData->StudentPostfach = $enrolmentData->postalOfficeBox;
-        $omnitrackerEnrolmentData->StudentStrasse = $enrolmentData->street;
         $omnitrackerEnrolmentData->StudiengangsversionParallelUniqueId = $enrolmentData->studiengangsversionParallelUniqueId;
         $omnitrackerEnrolmentData->StudiengangsversionUniqueId = $enrolmentData->subject;
         $omnitrackerEnrolmentData->StudienstrukturParallelUniqueId = $enrolmentData->studienstrukturParallelUniqueId;
@@ -226,10 +225,59 @@ final readonly class Adapters
         $omnitrackerEnrolmentData->WunschEinstufungsSemester = $enrolmentData->furtherInformation;
         $omnitrackerEnrolmentData->StudienstufeBFS = $enrolmentData->studienstufeBFS;
         $omnitrackerEnrolmentData->StudienstufeUniqueId = $enrolmentData->degreeProgram;
-        $omnitrackerEnrolmentData->Telefon = $enrolmentData->homePhoneAreaCode;
-        $omnitrackerEnrolmentData->TelefonTyp = $enrolmentData->homePhoneNumber;
         $omnitrackerEnrolmentData->VorbildungMasterabschluss = $enrolmentData->vorbildungMasterabschluss;
+
+        /**
+         * Personal Data
+         */
+        $omnitrackerEnrolmentData->AnredeUniqueId = $enrolmentData->salutation;
         $omnitrackerEnrolmentData->Vorname = $enrolmentData->firstName;
+        $omnitrackerEnrolmentData->Vorname2 = $enrolmentData->secondFirstName;
+        $omnitrackerEnrolmentData->Vorname3 = $this->mapArrayToCommaSeparatedString($enrolmentData->additionalFirstNames);
+        $omnitrackerEnrolmentData->Nachname = $enrolmentData->lastName;
+        $omnitrackerEnrolmentData->Matrikelnummer = $enrolmentData->registrationNumber;
+        $omnitrackerEnrolmentData->LandUniqueId = $enrolmentData->country;
+        $omnitrackerEnrolmentData->StudentAdresszusatz = $enrolmentData->extraAddressLine;
+        $omnitrackerEnrolmentData->StudentStrasse = $this->mapArrayToSpaceSeparatedString([$enrolmentData->street, $enrolmentData->houseNumber]);
+        $omnitrackerEnrolmentData->StudentPostfach = $enrolmentData->postalOfficeBox;
+        $omnitrackerEnrolmentData->StudentPLZ = $enrolmentData->postalCode;
+        $omnitrackerEnrolmentData->StudentOrtUniqueId = $enrolmentData->place;
+        $omnitrackerEnrolmentData->Telefon = $this->mapPhoneNumber(
+            $enrolmentData->businessPhoneAreaCode,
+            $enrolmentData->businessPhoneNumber,
+            $enrolmentData->homePhoneAreaCode,
+            $enrolmentData->homePhoneNumber,
+            $enrolmentData->mobilePhoneAreaCode,
+            $enrolmentData->mobilePhoneNumber,
+        );
+        $omnitrackerEnrolmentData->TelefonTyp = $this->mapPhoneNumberType(
+            $enrolmentData->businessPhoneAreaCode,
+            $enrolmentData->businessPhoneNumber,
+            $enrolmentData->homePhoneAreaCode,
+            $enrolmentData->homePhoneNumber,
+            $enrolmentData->mobilePhoneAreaCode,
+            $enrolmentData->mobilePhoneNumber,
+        );
+        $omnitrackerEnrolmentData->EmailPrivat = $enrolmentData->email;
+        $omnitrackerEnrolmentData->MutterspracheUniqueId = $enrolmentData->motherLanguage;
+        $omnitrackerEnrolmentData->KorrespondenzspracheUniqueId = $enrolmentData->correspondenceLanguage;
+        $omnitrackerEnrolmentData->Geburtstag = $enrolmentData->birthDate;
+        $omnitrackerEnrolmentData->AHV = $enrolmentData->oldAgeSurvivarInsuranceNumber;
+        $omnitrackerEnrolmentData->NationalitaetUniqueId = $enrolmentData->nationally;
+        $omnitrackerEnrolmentData->HeimatortUniqueId = $enrolmentData->originPlace;
+        //parents-adress true?
+        $omnitrackerEnrolmentData->ElternAnredeUniqueId = $enrolmentData->parentsAddressSalutation;
+        $omnitrackerEnrolmentData->ElternVorname = $this->mapArrayToCommaSeparatedString($enrolmentData->parentsAddressFirstNames);
+        $omnitrackerEnrolmentData->ElternNachname = $enrolmentData->parentsAddressLastName;
+        //"parents-address-same-address": false ?
+        $omnitrackerEnrolmentData->ElternLandUniqueId = $enrolmentData->parentsAddressCountry;
+        $omnitrackerEnrolmentData->ElternAdresszusatz = $enrolmentData->parentsAddressExtraAddressLine;
+        $omnitrackerEnrolmentData->ElternStrasse = $this->mapArrayToSpaceSeparatedString([$enrolmentData->parentsAddressStreet, $enrolmentData->parentsAddressHouseNumber]);
+        $omnitrackerEnrolmentData->ElternPLZ = $enrolmentData->parentsAddressPostalCode;
+        $omnitrackerEnrolmentData->ElternOrtUniqueId = $enrolmentData->parentsAddressPlace;
+        $omnitrackerEnrolmentData->PostEltern = (int)$enrolmentData->parentsAddressGeneralPost;
+        $omnitrackerEnrolmentData->RechnungEltern = (int)$enrolmentData->parentsAddressInvoices;
+
 
         return $omnitrackerEnrolmentData;
     }
@@ -271,5 +319,124 @@ final readonly class Adapters
         $str = ucwords($str);
         $str = str_replace(' ', '', $str);
         return lcfirst($str);
+    }
+
+    private function mapArrayToCommaSeparatedString($inputArray): string
+    {
+        return implode(", ", $inputArray);
+    }
+
+    private function mapCommaSeparatedStringToArray(string $inputString): array
+    {
+        return explode(", ", $inputString);
+    }
+
+    private function mapArrayToSpaceSeparatedString(array $inputArray): string
+    {
+        return trim(implode(" ", $inputArray));
+    }
+
+    private function extractStringFromStringSpaceNumberString(string $inputString): string
+    {
+        $elements = explode(' ', $inputString);
+        $lastElement = end($elements);
+        $lastElement = trim($lastElement);
+
+        if (is_numeric($lastElement)) {
+            return trim(str_replace($lastElement, '', $inputString));
+        } else {
+            return $inputString;
+        }
+    }
+
+    private function extractNumberFromStringSpaceNumberString(string $inputString): int|null
+    {
+        $elements = explode(' ', $inputString);
+        $lastElement = end($elements);
+        $lastElement = trim($lastElement);
+
+        if (is_numeric($lastElement)) {
+            return $lastElement;
+        } else {
+            return null;
+        }
+    }
+
+
+    /**
+     * - Maps the processed phone numbers to the phone number with the highest priority
+     *   The frontend already validates, that only one phone number is valid by processing the form
+     * - Validates the phone number with googles PhoneNumberUtil
+     * @throws NumberParseException
+     */
+    public function mapPhoneNumber(
+        string $businessPhoneAreaCode,
+        string $businessPhoneNumber,
+        string $homePhoneAreaCode,
+        string $homePhoneNumber,
+        string $mobilePhoneAreaCode,
+        string $mobilePhoneNumber,
+    ): string
+    {
+        $extractAndFormatNumber = function ($countryCode, $number) {
+            $phoneNumberUtil = PhoneNumberUtil::getInstance(PhoneNumberUtil::META_DATA_FILE_PREFIX);
+            $regionCode = $phoneNumberUtil->getRegionCodeForCountryCode($countryCode);
+            $number = $phoneNumberUtil->parse($number, $regionCode);
+            return $phoneNumberUtil->format($number, PhoneNumberFormat::INTERNATIONAL);
+        };
+        $phoneNumber = "";
+        if (empty($businessPhoneAreaCode) === false && empty($businessPhoneNumber) === false) {
+            $phoneNumber = $extractAndFormatNumber($businessPhoneAreaCode, $businessPhoneNumber);
+        }
+        if (empty($homePhoneAreaCode) === false && empty($homePhoneNumber) === false) {
+            $phoneNumber = $extractAndFormatNumber($homePhoneAreaCode, $homePhoneNumber);
+        }
+        if (empty($mobilePhoneAreaCode) === false && empty($mobilePhoneNumber) === false) {
+            $phoneNumber = $extractAndFormatNumber($mobilePhoneAreaCode, $mobilePhoneNumber);
+        }
+        return $phoneNumber;
+    }
+
+    /**
+     * - Maps the processed phone numbers to the phone number type the highest priority
+     *   The frontend already validates, that only one phone number is valid by processing the form
+     * @throws Exception
+     * @see mapPhoneNumber
+     */
+    public function mapPhoneNumberType(
+        string $businessPhoneAreaCode,
+        string $businessPhoneNumber,
+        string $homePhoneAreaCode,
+        string $homePhoneNumber,
+        string $mobilePhoneAreaCode,
+        string $mobilePhoneNumber,
+    ): string
+    {
+        if (empty($businessPhoneAreaCode) === false && empty($businessPhoneNumber) === false) {
+            return "business";
+        }
+        if (empty($homePhoneAreaCode) === false && empty($homePhoneNumber) === false) {
+            return "home";
+        }
+        if (empty($mobilePhoneAreaCode) === false && empty($mobilePhoneNumber) === false) {
+            return "mobile";
+        }
+        return "";
+    }
+
+    public function mapPhoneNumberToAreaCode(string $fromPhoneNumber, string $fromPhoneNumberType, string $toPhoneNumberType): string
+    {
+        if ($fromPhoneNumberType !== $toPhoneNumberType) {
+            return "";
+        }
+        return explode(" ", $fromPhoneNumber)[0];
+    }
+
+    public function removeAreaCodeFromPhoneNumber(string $fromPhoneNumber, string $fromPhoneNumberType, string $toPhoneNumberType): string
+    {
+        if ($fromPhoneNumberType !== $toPhoneNumberType) {
+            return "";
+        }
+        return substr(strstr($fromPhoneNumber, ' '), 1);
     }
 }
