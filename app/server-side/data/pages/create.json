@@ -4,8 +4,28 @@
     "semesters": {
       "$ref": "../input-options/semesters.json"
     },
-    "min-password-length": 8
+    "min-password-length": 1
+  },
+  "values": {
   },
   "can-back": false,
-  "can-logout": false
+  "can-logout": false,
+  "dataToProcess": {
+    "name": "dataToProcess",
+    "type": "object",
+    "properties": {
+      "confirm-password": {
+        "name": "confirm-password",
+        "type": "string"
+      },
+      "password": {
+        "name": "password",
+        "type": "string"
+      },
+      "semester": {
+        "name": "semester",
+        "type": "string"
+      }
+    }
+  }
 }

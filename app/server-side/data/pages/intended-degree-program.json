@@ -2,7 +2,20 @@
   "page": "intended-degree-program",
   "data": {
     "subjects": {
-      "$dynamic": "readSubjectData"
+      "$dynamic": {
+        "method": "readSubjectData",
+        "parameters": {
+          "inputOptionDataDirectory": {
+            "$state": "data.inputOptionDataDirectory"
+          },
+          "inputNameSubjects": {
+            "$state": "data.inputNames.subjects"
+          },
+          "degreeProgram": {
+            "$state": "data.enrolmentData.degreeProgram"
+          }
+        }
+      }
     }
   },
   "can-back": true,

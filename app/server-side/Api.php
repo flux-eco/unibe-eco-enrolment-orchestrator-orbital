@@ -1,39 +1,32 @@
 <?php
 
-use FluxEco\UnibeEnrolment;
-use FluxEco\HttpWorkflowRequestHandler;
-use FluxEcoType\FluxEcoContentType;
-use FluxEcoType\FluxEcoExceptionDefinitions\FluxEcoException;
-use FluxEcoType\FluxEcoHttpStatusCode;
-use FluxEcoType\FluxEcoResponseDefinition;
+use FluxEcoType\FluxEcoStateValues;
 
 final readonly class Api
 {
     public Adapters $adapters;
-    public UnibeEnrolment\Api $unibeEnrolmentApi;
-    public HttpWorkflowRequestHandler\Api $httpWorkflowRequestHandlerApi;
 
+    /**
+     * @throws Exception
+     */
     private function __construct()
     {
         $this->adapters = Adapters::new();
-        $this->unibeEnrolmentApi = UnibeEnrolment\Api::new(
-            UnibeEnrolment\Types\Outbounds::new(
-                $this->adapters->newUnibeEnrolmentOutboundsActionsProcessor()
-            )
-        );
-        $this->httpWorkflowRequestHandlerApi = HttpWorkflowRequestHandler\Api::new(HttpWorkflowRequestHandler\Types\Outbounds::new(
-            $this->adapters->newHttpWorkflowRequestHandlerOutboundsActionsProcessor($this->unibeEnrolmentApi)
-        ));
     }
 
-    public static function new()
+    public static function new(): Api
     {
         return new self();
     }
 
-
+    /**
+     * @throws Exception
+     */
     public function handleHttpRequest(Swoole\Http\Request $request, Swoole\Http\Response $response, Swoole\Table $transactionDataCache): void
     {
-        $this->httpWorkflowRequestHandlerApi->handleHttpRequest($request, $response, $transactionDataCache);
+        match ($request->server["request_method"]) {
+            "GET" => $this->adapters->httpTransactionGateway->handleHttpGetRequest($request, $response, $this->adapters->objectFromJsonFile(), $this->adapters->readCookie($request), $this->adapters->storeCookie($response), $this->adapters->readTransactionStateValuesFromCache($transactionDataCache), $this->adapters->storeTransactionStateValuesInCache($transactionDataCache), $this->adapters->readTransactionStateValuesFromManager()),
+            "POST" => $this->adapters->httpTransactionGateway->handleHttpPostRequest($request, $response, $this->adapters->readCookie($request), $this->adapters->storeCookie($response), $this->adapters->readTransactionStateValuesFromCache($transactionDataCache), $this->adapters->storeTransactionStateValuesInCache($transactionDataCache), $this->adapters->readTransactionStateValuesFromManager(), $this->adapters->processDataByTransactionStateManager())
+        };
     }
 }

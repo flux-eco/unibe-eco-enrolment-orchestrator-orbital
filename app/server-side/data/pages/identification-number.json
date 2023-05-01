@@ -2,7 +2,7 @@
   "page": "identification-number",
   "data": {
     "identification-number": {
-      "$state": "data.Identifikationsnummer"
+      "$state": "data.enrolmentData.identificationNumber"
     }
   },
   "can-back": false,

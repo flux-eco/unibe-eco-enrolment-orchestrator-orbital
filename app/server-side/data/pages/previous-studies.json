@@ -1,0 +1,46 @@
+{
+  "menu": {
+    "ids": [
+      "application-login"
+    ],
+    "id": "application-login"
+  },
+  "page": "previous-studies",
+  "data": {
+    "certificate-types": {
+      "$ref": "../input-options/certificate-types-upper-secondary-schools.json"
+    },
+    "min-start-date": {
+      "$dynamic": "readPreviousStudiesMinStartDate"
+    },
+    "max-start-date": {
+      "$dynamic": "readPreviousStudiesMaxStartDate"
+    },
+    "min-end-date": {
+      "$dynamic": "readPreviousStudiesMinEndDate"
+    },
+    "max-end-date": {
+      "$dynamic": "readPreviousStudiesMaxEndDate"
+    },
+    "schools": {
+      "$ref": "../input-options/universities.json"
+    },
+    "min-semesters": 1,
+    "max-semesters": 99,
+    "degree-titles": {
+      "$ref": "../input-options/degree-programs.json"
+    },
+    "countries": {
+      "$ref": "../input-options/countries.json"
+    },
+    "cantons": {
+      "$ref": "../input-options/cantons.json"
+    },
+    "places": {
+      "$ref": "../input-options/nationalities.json"
+    },
+    "values": null
+  },
+  "can-back": true,
+  "can-logout": true
+}

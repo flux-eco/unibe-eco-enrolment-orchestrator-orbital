@@ -2,13 +2,40 @@
   "page": "intended-degree-program-2",
   "data": {
     "subject": {
-      "$dynamic": "readChoosenSubjectData"
+      "$dynamic": {
+        "method": "readChoosenSubjectData",
+        "parameters": {
+          "subject": {
+            "$state": "data.enrolmentData.subject"
+          },
+          "subjectTitle": {
+            "$state": "data.enrolmentData.subjectTitle"
+          },
+          "subjectEcts": {
+            "$state": "data.enrolmentData.subjectEcts"
+          }
+        }
+      }
     },
     "combination": {
-      "$dynamic": "readSubjectCombinationData"
+      "$dynamic": {
+        "method": "readSubjectCombinationData",
+        "parameters": {
+          "inputOptionDataDirectory": {
+            "$state": "data.inputOptionDataDirectory"
+          },
+          "inputNameSubjectCombinations": {
+            "$state": "data.inputNames.subjectCombinations"
+          },
+          "combination": {
+            "$state": "data.enrolmentData.combination"
+          }
+        }
+      }
     },
+
     "values": null
   },
   "can-back": true,
   "can-logout": true
-}
+}git
